@@ -120,9 +120,11 @@ export class SubscriptionsFacade {
     }
     return [...groups.entries()]
       .map(([key, group]) => ({ key, ...group }))
-      .sort((a, b) =>
-        a.key === '' ? 1 : b.key === '' ? -1 : a.label.localeCompare(b.label, 'it'),
-      );
+      .sort((a, b) => {
+        // Gli abbonamenti senza categoria vanno in fondo.
+        if (a.key === '' || b.key === '') return Number(a.key === '') - Number(b.key === '');
+        return a.label.localeCompare(b.label, 'it');
+      });
   });
 
   readonly ended = computed(() => this.subscriptions.value().filter((item) => !item.active));
@@ -208,10 +210,10 @@ export class SubscriptionsFacade {
       this.overview.reload();
       this.subscriptions.reload();
       this.calendar.reload();
-    } catch (failure) {
+    } catch (error) {
       this.saveErrorState.set(
-        failure instanceof SubscriptionRejectedError
-          ? failure.message
+        error instanceof SubscriptionRejectedError
+          ? error.message
           : 'Non è stato possibile salvare. Riprova tra poco.',
       );
     } finally {

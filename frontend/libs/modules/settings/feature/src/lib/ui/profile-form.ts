@@ -194,7 +194,12 @@ export class ProfileForm {
   private readonly model = signal<ProfileModel>(emptyModel());
 
   protected readonly profileForm = form(this.model, profileSchema, {
-    submission: { action: async () => this.emit() },
+    submission: {
+      action: () => {
+        this.emit();
+        return Promise.resolve();
+      },
+    },
   });
 
   /** Vero appena si tocca qualcosa: fa sparire il «Salvato» di un salvataggio precedente. */

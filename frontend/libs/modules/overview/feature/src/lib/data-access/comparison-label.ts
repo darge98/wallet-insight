@@ -3,7 +3,7 @@ import { DateRange, endOfMonth, fromIsoDate, toIsoDate } from '@wallet/shared-do
 const MONTH_FORMATTER = new Intl.DateTimeFormat('it-IT', { month: 'long' });
 
 /** Mesi che richiedono la "d" eufonica: "rispetto ad agosto". */
-const VOWEL_INITIALS = ['a', 'e', 'i', 'o', 'u'];
+const VOWEL_INITIALS = new Set(['a', 'e', 'i', 'o', 'u']);
 
 /**
  * Come nominare, dopo «rispetto», il periodo con cui il server ha confrontato i KPI.
@@ -18,7 +18,7 @@ export function comparisonLabel(previous: DateRange): string {
   }
   const month = MONTH_FORMATTER.format(from);
   if (previous.to === toIsoDate(endOfMonth(from))) {
-    return `${VOWEL_INITIALS.includes(month.charAt(0)) ? 'ad' : 'a'} ${month}`;
+    return `${VOWEL_INITIALS.has(month.charAt(0)) ? 'ad' : 'a'} ${month}`;
   }
   return `allo stesso periodo di ${month}`;
 }

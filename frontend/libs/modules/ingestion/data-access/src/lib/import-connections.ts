@@ -25,11 +25,11 @@ export class ImportConnections {
       .value()
       .filter((connection) => connection.enabled && connection.lastRunAt !== null)
       .map((connection) => connection.lastRunAt as string);
-    return istanti.length === 0
-      ? null
-      : istanti.reduce((ultimo, istante) =>
-          Date.parse(istante) > Date.parse(ultimo) ? istante : ultimo,
-        );
+    return istanti.reduce<string | null>(
+      (ultimo, istante) =>
+        ultimo === null || Date.parse(istante) > Date.parse(ultimo) ? istante : ultimo,
+      null,
+    );
   });
 
   readonly withRejectedCredentials = computed(() =>

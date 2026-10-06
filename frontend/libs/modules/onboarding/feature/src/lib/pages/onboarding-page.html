@@ -174,7 +174,7 @@
             <app-import-source-option
               [name]="source.name"
               [description]="copy().sourceDescriptions[source.source]"
-              [tag]="sourceTag(source.available)"
+              [tag]="source.available ? null : copy().comingSoonTag"
               [selected]="importForm.choice().value() === source.source"
               [disabled]="!source.available"
               (choose)="choose(source.source)"

@@ -106,10 +106,10 @@ export class CategoriesFacade {
     try {
       await operation();
       if (closes) this.editingState.set(null);
-    } catch (failure) {
+    } catch (error) {
       this.failureState.set(
-        failure instanceof CategoryRejectedError
-          ? failure.message
+        error instanceof CategoryRejectedError
+          ? error.message
           : 'Non è stato possibile salvare. Riprova tra poco.',
       );
     } finally {

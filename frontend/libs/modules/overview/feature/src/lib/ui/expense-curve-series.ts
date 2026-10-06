@@ -21,7 +21,7 @@ export function expenseCurveSeries(
   range: DateRange,
 ): ExpenseCurveSeries | null {
   const first = points[0];
-  const lastPoint = points[points.length - 1];
+  const lastPoint = points.at(-1);
   if (!first || !lastPoint) {
     return null;
   }
@@ -29,7 +29,7 @@ export function expenseCurveSeries(
     dayStart(point.date),
     toMajorUnits(point.total),
   ]);
-  const last = data[data.length - 1] as CurvePoint;
+  const last = data.at(-1) as CurvePoint;
   if (first.date > range.from) {
     data.unshift([dayStart(range.from), 0]);
   }
