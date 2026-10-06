@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wallet Insights · Le tue finanze, sul tuo server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Personal finance tracker self-hosted: importa i movimenti da BudgetBakers e li riorganizza con categorie, budget e abbonamenti."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,500&display=swap"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      // Il tema scelto a mano vale prima del primo paint, così non lampeggia.
+      try {
+        const tema = localStorage.getItem('tema');
+        if (tema) document.documentElement.dataset.theme = tema;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="salta" href="#contenuto">Vai al contenuto</a>
+
+    <header class="nav">
+      <div class="contenitore nav__riga">
+        <a class="marchio" href="#" aria-label="Wallet Insights, inizio pagina">
+          <img src="favicon.svg" alt="" width="28" height="28" />
+          <span>Wallet Insights</span>
+        </a>
+        <nav aria-label="Sezioni">
+          <ul class="nav__voci">
+            <li><a href="#funzioni">Funzioni</a></li>
+            <li><a href="#principi">Principi</a></li>
+            <li><a href="#installa">Installa</a></li>
+          </ul>
+        </nav>
+        <div class="nav__azioni">
+          <button class="btn btn-icona" type="button" id="cambia-tema" aria-label="Cambia tema">
+            <i class="ph ph-moon" aria-hidden="true"></i>
+          </button>
+          <a class="btn btn-secondario" href="https://github.com/darge98/wallet-insight">
+            <i class="ph ph-github-logo" aria-hidden="true"></i>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main id="contenuto">
+      <!-- Hero -->
+      <section class="hero contenitore">
+        <div class="hero__testo">
+          <h1 class="entra">Il tuo margine, <em>ogni mese.</em></h1>
+          <p class="hero__sotto entra" style="--i: 1">
+            Wallet Insights importa i movimenti da BudgetBakers e li riordina: categorie tue, budget
+            mensili, abbonamenti. Sul tuo server.
+          </p>
+          <div class="hero__cta entra" style="--i: 2">
+            <a class="btn btn-primario" href="#installa">Installa</a>
+            <a class="btn btn-testo" href="https://github.com/darge98/wallet-insight">
+              GitHub <i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+
+        <figure class="anteprima entra" style="--i: 1" aria-labelledby="anteprima-didascalia">
+          <div class="anteprima__testa">
+            <span class="anteprima__periodo">Ottobre 2026</span>
+            <span class="etichetta-esempio">Dati d'esempio</span>
+          </div>
+          <dl class="kpi">
+            <div class="kpi__margine">
+              <dt>Margine</dt>
+              <dd class="cifra cifra--grande positivo" data-centesimi="61240" data-segno></dd>
+            </div>
+            <div>
+              <dt>Entrate</dt>
+              <dd class="cifra" data-centesimi="248000"></dd>
+            </div>
+            <div>
+              <dt>Uscite</dt>
+              <dd class="cifra" data-centesimi="186760"></dd>
+            </div>
+          </dl>
+          <div class="grafico" id="grafico-uscite" role="img" aria-label="Uscite cumulative di ottobre confrontate con settembre"></div>
+          <figcaption id="anteprima-didascalia" class="legenda">
+            <span><i class="linea linea--attuale" aria-hidden="true"></i>Uscite di ottobre</span>
+            <span><i class="linea linea--prima" aria-hidden="true"></i>Settembre</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- Funzioni -->
+      <section class="sezione contenitore" id="funzioni" aria-labelledby="funzioni-titolo">
+        <h2 id="funzioni-titolo" class="titolo-sezione rivela">Ogni euro al suo posto.</h2>
+
+        <div class="bento">
+          <article class="cella cella--panoramica rivela">
+            <div class="cella__testa">
+              <i class="ph ph-chart-line-up" aria-hidden="true"></i>
+              <h3>Panoramica</h3>
+            </div>
+            <p>Patrimonio, entrate, uscite e margine del periodo, con le categorie che pesano di più.</p>
+            <ol class="classifica" id="classifica" aria-label="Uscite per categoria, dati d'esempio"></ol>
+          </article>
+
+          <article class="cella cella--budget rivela">
+            <div class="cella__testa">
+              <i class="ph ph-target" aria-hidden="true"></i>
+              <h3>Budget</h3>
+            </div>
+            <p>Limiti mensili su gruppi di categorie, con speso e residuo.</p>
+            <ul class="budget" id="budget" aria-label="Budget del mese, dati d'esempio"></ul>
+          </article>
+
+          <article class="cella cella--movimenti rivela">
+            <div class="cella__testa">
+              <i class="ph ph-list-magnifying-glass" aria-hidden="true"></i>
+              <h3>Movimenti</h3>
+            </div>
+            <p>Filtri per periodo, natura, conti e categorie. I totali valgono per tutto il filtro.</p>
+            <div class="filtro" role="group" aria-label="Natura">
+              <button type="button" class="filtro__voce" data-natura="tutti" aria-pressed="true">Tutti</button>
+              <button type="button" class="filtro__voce" data-natura="uscita" aria-pressed="false">Uscite</button>
+              <button type="button" class="filtro__voce" data-natura="entrata" aria-pressed="false">Entrate</button>
+            </div>
+            <ul class="movimenti" id="movimenti" aria-live="polite"></ul>
+            <p class="movimenti__totale">Totale <strong class="cifra" id="movimenti-totale"></strong></p>
+          </article>
+
+          <article class="cella cella--abbonamenti rivela">
+            <div class="cella__testa">
+              <i class="ph ph-calendar-dots" aria-hidden="true"></i>
+              <h3>Abbonamenti</h3>
+            </div>
+            <p>Gli addebiti ricorrenti che dichiari tu, in elenco o in calendario.</p>
+            <p class="abbonamenti__costo">
+              <span class="cifra cifra--grande" id="abbonamenti-mese"></span>
+              <span>al mese, <span class="cifra" id="abbonamenti-anno"></span> l'anno</span>
+            </p>
+            <ol class="calendario" id="calendario" aria-label="Rinnovi di ottobre, dati d'esempio"></ol>
+          </article>
+
+          <article class="cella cella--categorie rivela">
+            <div class="cella__testa">
+              <i class="ph ph-tree-structure" aria-hidden="true"></i>
+              <h3>Categorie</h3>
+            </div>
+            <p>Un albero a due livelli, tuo. Ogni categoria di BudgetBakers si aggancia a una delle tue.</p>
+            <ul class="aggancio" aria-label="Esempio di aggancio">
+              <li><span class="sorgente">Groceries</span><i class="ph ph-arrow-right" aria-hidden="true"></i><span>Casa <span class="sep">/</span> Spesa</span></li>
+              <li><span class="sorgente">Rent</span><i class="ph ph-arrow-right" aria-hidden="true"></i><span>Casa <span class="sep">/</span> Affitto</span></li>
+              <li><span class="sorgente">Restaurant, fast-food</span><i class="ph ph-arrow-right" aria-hidden="true"></i><span>Fuori <span class="sep">/</span> Ristoranti</span></li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- Principi -->
+      <section class="sezione principi" id="principi" aria-labelledby="principi-titolo">
+        <div class="contenitore">
+          <h2 id="principi-titolo" class="titolo-sezione rivela">I conti li fa il database.</h2>
+          <p class="principi__intro rivela">
+            Il browser mostra, PostgreSQL calcola. Così il totale che leggi è lo stesso che ottieni con
+            una query.
+          </p>
+          <div class="principi__griglia">
+            <div class="principio rivela">
+              <i class="ph ph-coins" aria-hidden="true"></i>
+              <h3>Centesimi interi</h3>
+              <p>Ogni importo viaggia come intero in centesimi, dal database al JSON. Nessun arrotondamento che si accumula.</p>
+            </div>
+            <div class="principio rivela">
+              <i class="ph ph-database" aria-hidden="true"></i>
+              <h3>Aggregazioni in PostgreSQL</h3>
+              <p>Filtri, ordinamenti, totali e classifiche girano nel database, anche su anni di movimenti.</p>
+            </div>
+            <div class="principio rivela">
+              <i class="ph ph-lock-key" aria-hidden="true"></i>
+              <h3>Token cifrato</h3>
+              <p>Il token personale di BudgetBakers resta nel tuo database, cifrato con AES-256.</p>
+            </div>
+            <div class="principio rivela">
+              <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+              <h3>Import incrementale</h3>
+              <p>Ogni giorno e a ogni avvio arriva solo ciò che è cambiato dall'ultima volta.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Installa -->
+      <section class="sezione contenitore installa" id="installa" aria-labelledby="installa-titolo">
+        <div class="installa__testo rivela">
+          <h2 id="installa-titolo" class="titolo-sezione">Gira in tre comandi.</h2>
+          <p>
+            Serve Docker. Lo stack avvia PostgreSQL, il backend e l'app, che risponde su
+            <code>localhost:8081</code>. Al primo accesso colleghi BudgetBakers col token personale.
+          </p>
+          <ul class="stack" aria-label="Tecnologie">
+            <li>Angular</li>
+            <li>Spring Boot</li>
+            <li>PostgreSQL</li>
+            <li>Docker Compose</li>
+          </ul>
+        </div>
+
+        <div class="terminale rivela" style="--i: 1">
+          <div class="terminale__testa">
+            <span>zsh</span>
+            <button class="btn btn-icona btn-icona--chiaro" type="button" id="copia" aria-label="Copia i comandi">
+              <i class="ph ph-copy" aria-hidden="true"></i>
+            </button>
+          </div>
+          <pre id="comandi"><code><span class="prompt">$</span> cp .env.example .env
+<span class="prompt">$</span> openssl rand -base64 32
+<span class="commento"># la chiave generata va in ENCRYPTION_KEY dentro .env</span>
+<span class="prompt">$</span> docker compose up -d --build</code></pre>
+          <p class="terminale__esito" id="copia-esito" role="status"></p>
+        </div>
+      </section>
+
+      <!-- In arrivo -->
+      <section class="sezione contenitore arrivo" aria-labelledby="arrivo-titolo">
+        <p class="sopratitolo rivela">In arrivo</p>
+        <h2 id="arrivo-titolo" class="visivamente-nascosto">In arrivo</h2>
+        <ul class="arrivo__lista">
+          <li class="rivela"><span>Assistente AI</span><small>Domande in linguaggio naturale sui tuoi movimenti.</small></li>
+          <li class="rivela" style="--i: 1"><span>Obiettivi di risparmio</span><small>Accantonamenti dichiarati e una proiezione realistica.</small></li>
+          <li class="rivela" style="--i: 2"><span>Banche via PSD2</span><small>I movimenti direttamente dal conto, senza passare da un'app terza.</small></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="piede">
+      <div class="contenitore piede__riga">
+        <a class="marchio" href="#">
+          <img src="favicon.svg" alt="" width="24" height="24" />
+          <span>Wallet Insights</span>
+        </a>
+        <p>Personal finance tracker self-hosted.</p>
+        <a class="btn btn-testo" href="https://github.com/darge98/wallet-insight">
+          <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub
+        </a>
+      </div>
+    </footer>
+
+    <script src="main.js" type="module"></script>
+  </body>
+</html>
