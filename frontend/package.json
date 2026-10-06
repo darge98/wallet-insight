@@ -12,7 +12,8 @@
     "format": "nx format:write",
     "format:check": "nx format:check",
     "graph": "nx graph",
-    "verify": "npm run lint && npm test && npm run build"
+    "verify": "npm run lint && npm test && npm run build",
+    "coverage:new": "nx run-many -t test --coverage --skip-nx-cache && node tools/new-code-coverage.mjs"
   },
   "private": true,
   "engines": {

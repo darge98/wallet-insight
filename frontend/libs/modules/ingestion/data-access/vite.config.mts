@@ -22,6 +22,8 @@ export default defineConfig(() => ({
       reportsDirectory: '../../../../coverage/libs/modules/ingestion/data-access',
       provider: 'v8' as const,
       reporter: ['lcov'],
+      // Anche i file che nessun test tocca: altrimenti sparirebbero dal conteggio.
+      include: ['src/**/*.ts'],
     },
   },
 }));
