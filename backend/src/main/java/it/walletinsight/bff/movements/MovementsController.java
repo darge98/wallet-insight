@@ -32,6 +32,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * I movimenti di un utente: leggerli e correggere le tre cose che gli appartengono.
@@ -165,11 +166,9 @@ class MovementsController {
         if (raw == null || raw.isEmpty()) {
             return Set.of();
         }
-        Set<MovementKind> kinds = new LinkedHashSet<>();
-        for (String value : raw) {
-            kinds.add(KebabCase.to(MovementKind.class, value));
-        }
-        return kinds;
+        return raw.stream()
+                .map(value -> KebabCase.to(MovementKind.class, value))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private static MovementSort sortOf(String sortBy, String sortDirection) {

@@ -330,10 +330,10 @@ export class MovementsFacade {
       await this.subscriptionRepository.create(draft);
       this.subscriptionDraftState.set(null);
       this.subscribedState.update((ids) => new Set([...ids, record.id]));
-    } catch (failure) {
+    } catch (error) {
       this.subscriptionErrorState.set(
-        failure instanceof SubscriptionRejectedError
-          ? failure.message
+        error instanceof SubscriptionRejectedError
+          ? error.message
           : 'Non è stato possibile salvare. Riprova tra poco.',
       );
     } finally {
@@ -369,8 +369,8 @@ export class MovementsFacade {
       this.result.reload();
       this.categoryBreakdown.reload();
       this.spendingTargets.reload();
-    } catch (failure) {
-      this.saveFailureState.set(failure);
+    } catch (error) {
+      this.saveFailureState.set(error);
     } finally {
       this.savingState.set(false);
     }

@@ -145,10 +145,10 @@ export class BudgetsFacade {
       this.editingState.set(null);
       this.budgets.reload();
       this.report.reload();
-    } catch (failure) {
+    } catch (error) {
       this.saveErrorState.set(
-        failure instanceof BudgetRejectedError
-          ? failure.message
+        error instanceof BudgetRejectedError
+          ? error.message
           : 'Non è stato possibile salvare. Riprova tra poco.',
       );
     } finally {

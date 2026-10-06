@@ -81,7 +81,7 @@ class SubscriptionServiceTest extends AbstractDatabaseTest {
         SubscriptionsOverview settimana = service.overview(marta, 7);
 
         assertThat(settimana.until()).isEqualTo(LocalDate.of(2026, 10, 11));
-        assertThat(settimana.upcoming()).extracting(addebito -> addebito.date())
+        assertThat(settimana.upcoming()).extracting(UpcomingCharge::date)
                 .containsExactly(CINQUE_OTTOBRE);
     }
 

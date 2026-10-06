@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Un limite mensile di spesa su una o più categorie.
@@ -77,12 +78,9 @@ public record Budget(
 
     /** Fissa il limite da {@code month} in poi: i mesi precedenti restano col loro. */
     public Budget limitedFrom(YearMonth month, Money amount) {
-        List<BudgetLimit> nuovi = new ArrayList<>();
-        for (BudgetLimit limite : limits) {
-            if (limite.validFrom().isBefore(month)) {
-                nuovi.add(limite);
-            }
-        }
+        List<BudgetLimit> nuovi = limits.stream()
+                .filter(limite -> limite.validFrom().isBefore(month))
+                .collect(Collectors.toCollection(ArrayList::new));
         nuovi.add(new BudgetLimit(month, amount));
         return new Budget(id, userId, parentId, name, categories, nuovi);
     }

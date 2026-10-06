@@ -60,3 +60,31 @@ describe('ImportConnections', () => {
     expect(letture).toBe(1);
   });
 });
+
+describe('ImportConnections.lastRunAt', () => {
+  it('è l’ultimo import riuscito fra le sorgenti attive', async () => {
+    const connessioni = store({
+      findAll: async () => [
+        { ...RIFIUTATA, source: 'budget-bakers', lastRunAt: '2026-10-01T05:00:00Z' },
+        { ...RIFIUTATA, source: 'psd2', lastRunAt: '2026-10-04T05:00:00Z' },
+        { ...RIFIUTATA, source: 'psd2', lastRunAt: '2026-10-02T05:00:00Z' },
+        // In pausa: il suo import più recente non conta.
+        { ...RIFIUTATA, source: 'psd2', enabled: false, lastRunAt: '2026-10-05T05:00:00Z' },
+      ],
+      replaceToken: async () => RIFIUTATA,
+    });
+    await prossimoGiro();
+
+    expect(connessioni.lastRunAt()).toBe('2026-10-04T05:00:00Z');
+  });
+
+  it('è null se nessuna sorgente attiva ha mai importato', async () => {
+    const connessioni = store({
+      findAll: async () => [{ ...RIFIUTATA, lastRunAt: null }],
+      replaceToken: async () => RIFIUTATA,
+    });
+    await prossimoGiro();
+
+    expect(connessioni.lastRunAt()).toBeNull();
+  });
+});

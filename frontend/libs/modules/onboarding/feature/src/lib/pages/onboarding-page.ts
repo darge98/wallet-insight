@@ -169,8 +169,9 @@ export class OnboardingPage implements OnDestroy {
 
   protected readonly profileForm = form(this.profileModel, profileSchema, {
     submission: {
-      action: async () => {
+      action: () => {
         this.step.set('import');
+        return Promise.resolve();
       },
       onInvalid: (field) => focusFirstError(field),
     },
@@ -225,11 +226,6 @@ export class OnboardingPage implements OnDestroy {
     if (!state.touched()) return null;
     if (state.getError('required')) return 'required';
     return state.getError('jwt') ? 'format' : null;
-  }
-
-  /** Etichetta accanto al nome della sorgente: per ora solo la non disponibilità. */
-  protected sourceTag(available: boolean): string | null {
-    return available ? null : this.copy().comingSoonTag;
   }
 
   protected choose(choice: ImportChoice): void {

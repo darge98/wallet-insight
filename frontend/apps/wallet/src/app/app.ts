@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { UserFacade } from '@wallet/user-data-access';
@@ -49,10 +49,10 @@ import { UserFacade } from '@wallet/user-data-access';
     }
   `,
 })
-export class App {
+export class App implements OnInit {
   protected readonly users = inject(UserFacade);
 
-  constructor() {
+  ngOnInit(): void {
     void this.users.ensureLoaded();
   }
 

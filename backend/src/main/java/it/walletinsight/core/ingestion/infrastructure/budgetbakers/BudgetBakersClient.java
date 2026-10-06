@@ -86,21 +86,12 @@ class BudgetBakersClient {
             if (!page.hasMore()) {
                 return all;
             }
-            if (page.nextOffset() <= offset) {
-                throw new IllegalStateException(
-                        "Paginazione ferma: nextOffset %d non supera l'offset %d"
-                                .formatted(page.nextOffset(), offset));
-            }
-            offset = page.nextOffset();
+            offset = advance(offset, page.nextOffset());
         }
     }
 
     AccountsPageDto accountsPage(String token, int offset) {
-        String body = get(token, uriBuilder -> uriBuilder
-                .path("/v1/api/accounts")
-                .queryParam("limit", properties.pageSize())
-                .queryParam("offset", offset)
-                .queryParam("withTotal", true)
+        String body = get(token, uriBuilder -> page(uriBuilder, "/v1/api/accounts", offset)
                 .build());
         try {
             return objectMapper.readValue(body, AccountsPageDto.class);
@@ -128,21 +119,12 @@ class BudgetBakersClient {
             if (!page.hasMore()) {
                 return all;
             }
-            if (page.nextOffset() <= offset) {
-                throw new IllegalStateException(
-                        "Paginazione ferma: nextOffset %d non supera l'offset %d"
-                                .formatted(page.nextOffset(), offset));
-            }
-            offset = page.nextOffset();
+            offset = advance(offset, page.nextOffset());
         }
     }
 
     CategoriesPageDto categoriesPage(String token, int offset) {
-        String body = get(token, uriBuilder -> uriBuilder
-                .path("/v1/api/categories")
-                .queryParam("limit", properties.pageSize())
-                .queryParam("offset", offset)
-                .queryParam("withTotal", true)
+        String body = get(token, uriBuilder -> page(uriBuilder, "/v1/api/categories", offset)
                 .build());
         try {
             CategoriesPageDto page = objectMapper.readValue(body, CategoriesPageDto.class);
@@ -161,6 +143,24 @@ class BudgetBakersClient {
             throw new IllegalStateException(
                     "Risposta di /v1/api/categories non interpretabile: " + truncated(body), e);
         }
+    }
+
+    /** Una pagina di un elenco, sempre con `limit` esplicito e col totale. */
+    private UriBuilder page(UriBuilder uriBuilder, String path, int offset) {
+        return uriBuilder
+                .path(path)
+                .queryParam("limit", properties.pageSize())
+                .queryParam("offset", offset)
+                .queryParam("withTotal", true);
+    }
+
+    /** Una sorgente che non avanza farebbe girare il ciclo all'infinito. */
+    private static int advance(int offset, int nextOffset) {
+        if (nextOffset <= offset) {
+            throw new IllegalStateException(
+                    "Paginazione ferma: nextOffset %d non supera l'offset %d".formatted(nextOffset, offset));
+        }
+        return nextOffset;
     }
 
     /** Il corpo entra nei messaggi d'errore, e i messaggi finiscono nei log: non per intero. */
@@ -190,12 +190,7 @@ class BudgetBakersClient {
             if (!page.hasMore()) {
                 return all;
             }
-            if (page.nextOffset() <= offset) {
-                throw new IllegalStateException(
-                        "Paginazione ferma: nextOffset %d non supera l'offset %d"
-                                .formatted(page.nextOffset(), offset));
-            }
-            offset = page.nextOffset();
+            offset = advance(offset, page.nextOffset());
         }
     }
 
@@ -221,11 +216,7 @@ class BudgetBakersClient {
     }
 
     RecordsPageDto recordsPage(String token, LocalDate from, LocalDate toExclusive, int offset) {
-        String body = get(token, uriBuilder -> uriBuilder
-                .path("/v1/api/records")
-                .queryParam("limit", properties.pageSize())
-                .queryParam("offset", offset)
-                .queryParam("withTotal", true)
+        String body = get(token, uriBuilder -> page(uriBuilder, "/v1/api/records", offset)
                 .queryParam("recordDate", "gte." + from)
                 .queryParam("recordDate", "lt." + toExclusive)
                 .queryParam("convertTo", CONVERT_TO)
@@ -285,7 +276,7 @@ class BudgetBakersClient {
      */
     static SourceUnavailableException troppeRichieste(String retryAfter) {
         String attesa = minutiDiAttesa(retryAfter)
-                .map(minuti -> "riprova fra %d minuti.".formatted(minuti))
+                .map("riprova fra %d minuti."::formatted)
                 .orElse("riprova più tardi.");
         return new SourceUnavailableException(
                 "BudgetBakers ha ricevuto troppe richieste da questo token: " + attesa,
@@ -297,7 +288,7 @@ class BudgetBakersClient {
         try {
             long secondi = Long.parseLong(retryAfter.trim());
             return Optional.of(Math.max(1, (secondi + 59) / 60));
-        } catch (NumberFormatException | NullPointerException e) {
+        } catch (NumberFormatException | NullPointerException _) {
             return Optional.empty();
         }
     }

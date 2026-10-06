@@ -164,7 +164,7 @@ export class SubscriptionEditor {
 
   protected readonly subscriptionForm = form(this.model, subscriptionSchema, {
     submission: {
-      action: async () => {
+      action: () => {
         const { name, amount, startDate, endDate, categoryId, accountId } = this.model();
         this.saved.emit({
           name: name.trim(),
@@ -175,6 +175,7 @@ export class SubscriptionEditor {
           categoryId: categoryId === '' ? null : asCategoryId(categoryId),
           accountId: accountId === '' ? null : asAccountId(accountId),
         });
+        return Promise.resolve();
       },
     },
   });

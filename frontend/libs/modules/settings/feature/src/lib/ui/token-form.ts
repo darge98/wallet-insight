@@ -64,9 +64,10 @@ export class TokenForm {
 
   protected readonly tokenForm = form(this.model, tokenSchema, {
     submission: {
-      action: async () => {
+      action: () => {
         this.submitted.emit(this.model().token.trim());
         this.tokenForm().reset({ token: '' });
+        return Promise.resolve();
       },
     },
   });

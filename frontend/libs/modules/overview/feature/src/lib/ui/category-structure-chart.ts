@@ -178,11 +178,11 @@ export class CategoryStructureChart {
           const entry = entries[index];
           if (!entry) return '';
 
+          const movimenti =
+            entry.transactionCount === 1 ? '1 movimento' : `${entry.transactionCount} movimenti`;
           const nota = entry.residual
             ? `Le categorie oltre le prime ${entries.length - 1}`
-            : entry.transactionCount === 1
-              ? '1 movimento'
-              : `${entry.transactionCount} movimenti`;
+            : movimenti;
           return `<div style="color:${tokens.inkMuted};font-size:11px">${entry.label}</div>
             <div style="margin-top:2px;font-weight:500;font-variant-numeric:tabular-nums">${formatMoney(
               entry.amount,

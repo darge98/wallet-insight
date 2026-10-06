@@ -7,9 +7,9 @@
       (click)="closed.emit()"
     ></button>
 
-    <aside
-      class="fade-in app-scroll relative flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-line bg-surface px-7 py-7"
-      role="dialog"
+    <dialog
+      open
+      class="fade-in app-scroll relative flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-line bg-surface px-7 py-7 text-inherit"
       [attr.aria-label]="title()"
     >
       <header class="flex items-start justify-between gap-4">
@@ -234,6 +234,6 @@
           }
         </div>
       }
-    </aside>
+    </dialog>
   </div>
 }

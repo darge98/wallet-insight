@@ -80,7 +80,12 @@ export class RecordDetailPanel {
   });
 
   protected readonly editForm = form(this.model, {
-    submission: { action: async () => this.saved.emit(this.model()) },
+    submission: {
+      action: () => {
+        this.saved.emit(this.model());
+        return Promise.resolve();
+      },
+    },
   });
 
   /** Finché non si tocca niente non c'è niente da salvare: il bottone lo dice. */

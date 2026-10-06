@@ -1,4 +1,4 @@
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import {
   provideRouter,
@@ -35,7 +35,7 @@ export const appConfig: ApplicationConfig = {
       echarts: () => import('@wallet/shared-ui/echarts').then((m) => m.echarts),
     }),
 
-    provideHttpClient(withFetch()),
+    provideHttpClient(),
 
     // Nessun `API_BASE_URL`: vale il default relativo `/api`, sempre sulla stessa
     // origine della pagina. Nello stack lo inoltra nginx, con `npm start` il proxy

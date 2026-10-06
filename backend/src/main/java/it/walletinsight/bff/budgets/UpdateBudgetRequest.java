@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public record UpdateBudgetRequest(
         @Size(max = Budget.MAX_NAME_LENGTH)
-        @Pattern(regexp = ".*\\S.*", message = "non può essere vuoto")
+        @Pattern(regexp = "\\s*\\S.*", message = "non può essere vuoto")
         @Schema(example = "Uscite fuori") String name,
 
         @Size(min = 1) List<@NotNull UUID> categoryIds,

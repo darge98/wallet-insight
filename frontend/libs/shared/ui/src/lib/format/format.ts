@@ -13,11 +13,12 @@ function formatterFor(
   let formatter = currencyFormatters.get(key);
 
   if (!formatter) {
+    const compactDigits = compact ? 1 : 0;
     formatter = new Intl.NumberFormat(APP_LOCALE, {
       style: 'currency',
       currency,
       notation: compact ? 'compact' : 'standard',
-      maximumFractionDigits: decimals ? 2 : compact ? 1 : 0,
+      maximumFractionDigits: decimals ? 2 : compactDigits,
       minimumFractionDigits: decimals ? 2 : 0,
     });
     currencyFormatters.set(key, formatter);

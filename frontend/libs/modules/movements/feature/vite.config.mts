@@ -26,6 +26,8 @@ export default defineConfig(() => ({
       reportsDirectory: '../../../../coverage/libs/modules/movements/feature',
       provider: 'v8' as const,
       reporter: ['lcov'],
+      // Anche i file che nessun test tocca: altrimenti sparirebbero dal conteggio.
+      include: ['src/**/*.ts'],
     },
   },
 }));

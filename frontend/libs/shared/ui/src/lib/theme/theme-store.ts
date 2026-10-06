@@ -61,7 +61,7 @@ export class ThemeStore {
   }
 
   private applyToDom(theme: ResolvedTheme): void {
-    this.document.documentElement.setAttribute('data-theme', theme);
+    this.document.documentElement.dataset['theme'] = theme;
   }
 
   private readStoredPreference(): ThemePreference {

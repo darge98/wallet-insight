@@ -56,9 +56,9 @@ class JdbcBudgetRepositoryTest extends AbstractDatabaseTest {
                 new UserSettings(UserLanguage.IT, "Europe/Rome", DashboardPeriod.CURRENT_MONTH));
         users.insert(user);
         marta = user.id();
-        ristoranti = categoria("cat-1", "Ristoranti");
-        spesa = categoria("cat-2", "Spesa");
-        bar = categoria("cat-3", "Bar");
+        ristoranti = categoria("Ristoranti");
+        spesa = categoria("Spesa");
+        bar = categoria("Bar");
     }
 
     @Test
@@ -150,7 +150,7 @@ class JdbcBudgetRepositoryTest extends AbstractDatabaseTest {
         return Budget.create(marta, principale.id(), nome, Set.of(categorie), OTTOBRE, Money.of(limite));
     }
 
-    private CategoryId categoria(String externalId, String nome) {
+    private CategoryId categoria(String nome) {
         if (macro == null) {
             macro = Category.create(marta, null, "Cibo e bevande");
             categories.insertAll(List.of(macro));

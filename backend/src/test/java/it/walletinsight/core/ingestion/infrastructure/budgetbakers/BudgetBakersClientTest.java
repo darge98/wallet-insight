@@ -7,6 +7,7 @@ import it.walletinsight.core.ingestion.infrastructure.budgetbakers.dto.RecordsPa
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
@@ -14,10 +15,14 @@ import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withException;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 class BudgetBakersClientTest {
 
@@ -107,5 +112,66 @@ class BudgetBakersClientTest {
 
         assertThatCode(() -> BudgetBakersClient.requireRequestedWindow(pagina, LocalDate.of(2026, 7, 4)))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    void iContiSiLeggonoSeguendoLaPaginazione() {
+        server.expect(queryParam("offset", "0"))
+                .andRespond(json("""
+                        {"accounts": [{"id": "acc-1"}], "limit": 200, "offset": 0, "nextOffset": 200}"""));
+        server.expect(queryParam("offset", "200"))
+                .andRespond(json("""
+                        {"accounts": [{"id": "acc-2"}], "limit": 200, "offset": 200, "total": 2}"""));
+
+        assertThat(client.accounts(TOKEN)).extracting("id").containsExactly("acc-1", "acc-2");
+        server.verify();
+    }
+
+    @Test
+    void unaPaginazioneCheNonAvanzaSiFerma() {
+        // Senza il controllo il ciclo chiederebbe la stessa pagina all'infinito.
+        server.expect(queryParam("offset", "0"))
+                .andRespond(json("""
+                        {"accounts": [{"id": "acc-1"}], "limit": 200, "offset": 0, "nextOffset": 0}"""));
+
+        assertThatThrownBy(() -> client.accounts(TOKEN))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Paginazione ferma: nextOffset 0 non supera l'offset 0");
+    }
+
+    @Test
+    void leCategorieChiedonoUnaPaginaConLimitEsplicito() {
+        server.expect(requestTo(org.hamcrest.Matchers.startsWith("https://bb.test/v1/api/categories")))
+                .andExpect(queryParam("limit", "200"))
+                .andExpect(queryParam("withTotal", "true"))
+                .andRespond(json("""
+                        {"categories": [{"id": "cat-1", "name": "Ristoranti"}], "limit": 200, "offset": 0}"""));
+
+        assertThat(client.categories(TOKEN)).extracting("name").containsExactly("Ristoranti");
+    }
+
+    @Test
+    void leCategorieSenzaIlCampoAttesoFannoFallireLaLettura() {
+        server.expect(queryParam("offset", "0")).andRespond(json("""
+                {"limit": 200, "offset": 0}"""));
+
+        assertThatThrownBy(() -> client.categories(TOKEN))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Nessun campo 'categories'");
+    }
+
+    @Test
+    void iMovimentiChiedonoLaFinestraConEntrambiGliEstremi() {
+        server.expect(requestTo(org.hamcrest.Matchers.startsWith("https://bb.test/v1/api/records")))
+                .andExpect(queryParam("recordDate", "gte.2026-09-01", "lt.2026-10-01"))
+                .andExpect(queryParam("offset", "0"))
+                .andRespond(json("""
+                        {"records": [], "limit": 200, "offset": 0, "total": 0}"""));
+
+        assertThat(client.recordsBetween(TOKEN, LocalDate.of(2026, 9, 1), LocalDate.of(2026, 10, 1))).isEmpty();
+    }
+
+    private static org.springframework.test.web.client.ResponseCreator json(String body) {
+        return withSuccess(body, MediaType.APPLICATION_JSON);
     }
 }

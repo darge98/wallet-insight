@@ -40,11 +40,11 @@ class BudgetBakersImport {
     static final Duration INTERVALLO_MINIMO = Duration.ofMinutes(15);
 
     private final ImportService imports;
-    private final String cron;
+    private final String pianificazione;
 
-    BudgetBakersImport(ImportService imports, @Value(CRON) String cron) {
+    BudgetBakersImport(ImportService imports, @Value(CRON) String pianificazione) {
         this.imports = imports;
-        this.cron = cron;
+        this.pianificazione = pianificazione;
     }
 
     @Scheduled(cron = CRON, zone = ZONE)
@@ -54,7 +54,7 @@ class BudgetBakersImport {
 
     @EventListener(ApplicationReadyEvent.class)
     void importaAllAvvio() {
-        if (Scheduled.CRON_DISABLED.equals(cron)) {
+        if (Scheduled.CRON_DISABLED.equals(pianificazione)) {
             return;
         }
         Instant adesso = Instant.now();

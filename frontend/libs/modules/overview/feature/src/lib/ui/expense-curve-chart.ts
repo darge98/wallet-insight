@@ -59,7 +59,7 @@ export class ExpenseCurveChart {
   protected readonly accessibleDescription = computed(() => {
     const points = this.points();
     const first = points[0];
-    const last = points[points.length - 1];
+    const last = points.at(-1);
     if (!first || !last) return 'Crescita della spesa nel periodo';
     return `Spesa cumulata dal ${formatCompactDate(first.date)} al ${formatCompactDate(
       last.date,
@@ -97,7 +97,7 @@ export class ExpenseCurveChart {
       xAxis: {
         type: 'time',
         min: series.data[0]?.[0],
-        max: series.data[series.data.length - 1]?.[0],
+        max: series.data.at(-1)?.[0],
         splitNumber: TARGET_AXIS_LABELS,
         axisTick: { show: false },
         axisLine: { show: false },

@@ -102,4 +102,18 @@ describe('BudgetEditor', () => {
 
     expect(groupBox('Cibo e bevande').indeterminate).toBe(true);
   });
+
+  it('un sotto-budget oltre quanto resta al principale non si salva', async () => {
+    fixture.componentRef.setInput('parent', USCITE);
+    fixture.detectChanges();
+    click(groupBox('Uscite'));
+    type('#budget-name', 'Bar');
+    // Il principale ha 100 €: 150 non ci stanno.
+    type('#budget-limit', '150');
+
+    root().querySelector('form')?.dispatchEvent(new Event('submit'));
+    await fixture.whenStable();
+
+    expect(emitted).toEqual([]);
+  });
 });

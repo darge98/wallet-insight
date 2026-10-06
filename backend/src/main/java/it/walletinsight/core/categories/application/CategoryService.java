@@ -156,8 +156,7 @@ public class CategoryService {
     }
 
     /** Una categoria su cui si può classificare un movimento: dell'utente e non una macro. */
-    @Transactional(readOnly = true)
-    public Category requireSubcategory(UserId userId, CategoryId id) {
+    private Category requireSubcategory(UserId userId, CategoryId id) {
         Category categoria = requireCategory(userId, id);
         if (categoria.isMacro()) {
             throw new IllegalArgumentException(

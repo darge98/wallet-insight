@@ -48,16 +48,14 @@ public record MonthlyBudgets(
         Money speso = zero;
 
         for (Budget budget : budgets) {
-            if (!budget.isMain()) {
-                continue;
+            Optional<Status> stato = budget.isMain()
+                    ? statusOf(budget, month, spending, zero, budgets)
+                    : Optional.empty();
+            if (stato.isPresent()) {
+                principali.add(stato.get());
+                limite = limite.plus(stato.get().limit());
+                speso = speso.plus(stato.get().spent());
             }
-            Optional<Status> stato = statusOf(budget, month, spending, zero, budgets);
-            if (stato.isEmpty()) {
-                continue;
-            }
-            principali.add(stato.get());
-            limite = limite.plus(stato.get().limit());
-            speso = speso.plus(stato.get().spent());
         }
 
         return new MonthlyBudgets(month, List.copyOf(principali), limite, speso,

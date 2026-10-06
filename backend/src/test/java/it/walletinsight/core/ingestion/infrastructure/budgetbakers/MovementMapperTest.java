@@ -42,7 +42,7 @@ class MovementMapperTest {
 
     @Test
     void converte_l_importo_decimale_in_centesimi_interi() {
-        Movement movement = mappa(record().amount("-9.99").build());
+        Movement movement = mappa(movimento().amount("-9.99").build());
 
         assertThat(movement.amount().amount()).isEqualTo(-999L);
         assertThat(movement.amount().currency()).isEqualTo(CurrencyCode.EUR);
@@ -50,7 +50,7 @@ class MovementMapperTest {
 
     @Test
     void converte_anche_gli_importi_senza_decimali() {
-        assertThat(mappa(record().amount("-28").build()).amount().amount()).isEqualTo(-2800L);
+        assertThat(mappa(movimento().amount("-28").build()).amount().amount()).isEqualTo(-2800L);
     }
 
     /**
@@ -67,13 +67,13 @@ class MovementMapperTest {
      */
     @Test
     void arrotonda_per_eccesso_a_meta_senza_passare_per_un_double() {
-        assertThat(mappa(record().amount("1.005").build()).amount().amount()).isEqualTo(101L);
+        assertThat(mappa(movimento().amount("1.005").build()).amount().amount()).isEqualTo(101L);
         assertThat(Math.round(1.005 * 100)).isEqualTo(100L);
     }
 
     @Test
     void conserva_l_istante_della_sorgente_e_lascia_il_giorno_al_fuso_di_chi_guarda() {
-        Movement movement = mappa(record().recordDate("2026-09-15T23:30:00Z").build());
+        Movement movement = mappa(movimento().recordDate("2026-09-15T23:30:00Z").build());
 
         assertThat(movement.recordedAt()).isEqualTo(Instant.parse("2026-09-15T23:30:00Z"));
         // Le 23:30 UTC del 15 sono l'1:30 del 16 a Roma.
@@ -83,7 +83,7 @@ class MovementMapperTest {
     @Test
     void traduce_i_valori_dichiarati_dalla_specifica() {
         Movement movement =
-                mappa(record().recordType("income").recordState("waitForAssign").build());
+                mappa(movimento().recordType("income").recordState("waitForAssign").build());
 
         assertThat(movement.direction()).isEqualTo(MovementDirection.INCOME);
         assertThat(movement.state()).isEqualTo(MovementState.WAIT_FOR_ASSIGN);
@@ -91,7 +91,7 @@ class MovementMapperTest {
 
     @Test
     void non_scarta_il_movimento_quando_un_valore_non_e_previsto() {
-        Movement movement = mappa(record().recordState("qualcosa-di-nuovo").build());
+        Movement movement = mappa(movimento().recordState("qualcosa-di-nuovo").build());
 
         // L'importo e' un fatto: perderlo falserebbe il saldo, mentre uno stato
         // sconosciuto e' solo un'etichetta che non sappiamo ancora leggere.
@@ -103,13 +103,13 @@ class MovementMapperTest {
     void un_movimento_di_un_conto_sconosciuto_resta_fuori() {
         // Non e' salvabile: poggia su un conto che non esiste qui. Torna null e chi
         // chiama lo conta, invece di far fallire l'import di tutti gli altri.
-        assertThat(mapper.toMovement(record().build(), UTENTE, IngestionSource.BUDGET_BAKERS,
+        assertThat(mapper.toMovement(movimento().build(), UTENTE, IngestionSource.BUDGET_BAKERS,
                 Map.of("acc-altro", CONTO), CATEGORIE)).isNull();
     }
 
     @Test
     void aggancia_il_movimento_al_conto_di_margine_non_a_quello_della_sorgente() {
-        Movement movement = mappa(record().build());
+        Movement movement = mappa(movimento().build());
 
         assertThat(movement.accountId()).isEqualTo(CONTO);
         assertThat(movement.userId()).isEqualTo(UTENTE);
@@ -118,7 +118,7 @@ class MovementMapperTest {
 
     @Test
     void lascia_null_il_giroconto_quando_il_movimento_non_lo_e() {
-        Movement movement = mappa(record().transfer(null).build());
+        Movement movement = mappa(movimento().transfer(null).build());
 
         assertThat(movement.transfer()).isNull();
         assertThat(movement.isTransfer()).isFalse();
@@ -127,7 +127,7 @@ class MovementMapperTest {
     @Test
     void riconosce_un_giroconto_dichiarato_ma_non_collegabile() {
         // 14 movimenti su 1672 hanno transfer.type senza transferId.
-        Movement movement = mappa(record().transfer(new TransferDto("unpaired", null)).build());
+        Movement movement = mappa(movimento().transfer(new TransferDto("unpaired", null)).build());
 
         assertThat(movement.isTransfer()).isTrue();
         assertThat(movement.transfer().state()).isEqualTo(Transfer.TransferState.UNPAIRED);
@@ -136,7 +136,7 @@ class MovementMapperTest {
 
     @Test
     void conserva_i_campi_facoltativi_mancanti() {
-        Movement movement = mappa(record().note(null).counterParty(null).build());
+        Movement movement = mappa(movimento().note(null).counterParty(null).build());
 
         // Assenti dalla sorgente, e nessuno li ha riscritti: non c'e' niente da mostrare.
         assertThat(movement.description()).isNull();
@@ -147,7 +147,7 @@ class MovementMapperTest {
 
     @Test
     void aggancia_la_categoria_di_margine_e_ne_tiene_anche_la_traccia_grezza() {
-        Movement movement = mappa(record().build());
+        Movement movement = mappa(movimento().build());
 
         // L'identificatore e' quello di Wallet Insights, non quello della sorgente.
         assertThat(movement.classification().category()).isEqualTo(RISTORANTI);
@@ -161,7 +161,7 @@ class MovementMapperTest {
     void un_movimento_con_una_categoria_sconosciuta_entra_lo_stesso() {
         // A differenza di un conto mancante: senza conto il movimento non ha dove
         // stare, senza categoria e' solo un movimento da classificare.
-        Movement movement = mapper.toMovement(record().build(), UTENTE,
+        Movement movement = mapper.toMovement(movimento().build(), UTENTE,
                 IngestionSource.BUDGET_BAKERS, CONTI, Map.of("cat-altra", RISTORANTI));
 
         assertThat(movement).isNotNull();
@@ -171,14 +171,14 @@ class MovementMapperTest {
 
     @Test
     void un_movimento_in_euro_e_gia_convertito() {
-        Movement movement = mappa(record().amount("-9.99").build());
+        Movement movement = mappa(movimento().amount("-9.99").build());
 
         assertThat(movement.convertedAmount()).isEqualTo(movement.amount());
     }
 
     @Test
     void un_movimento_in_valuta_porta_anche_l_importo_in_euro_del_suo_giorno() {
-        Movement movement = mappa(record().amount("-50").currency("USD")
+        Movement movement = mappa(movimento().amount("-50").currency("USD")
                 .converted(new ConvertedAmountDto(new BigDecimal("-45.678912"), "EUR",
                         new BigDecimal("0.91357824"), null))
                 .build());
@@ -189,14 +189,14 @@ class MovementMapperTest {
 
     @Test
     void senza_il_cambio_del_giorno_l_import_si_ferma() {
-        RecordDto senzaCambio = record().amount("-50").currency("USD")
+        RecordDto senzaCambio = movimento().amount("-50").currency("USD")
                 .converted(new ConvertedAmountDto(null, "EUR", null, "Rate unavailable"))
                 .build();
 
         assertThatThrownBy(() -> mappa(senzaCambio))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Rate unavailable");
-        assertThatThrownBy(() -> mappa(record().amount("-50").currency("USD").build()))
+        assertThatThrownBy(() -> mappa(movimento().amount("-50").currency("USD").build()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -204,7 +204,7 @@ class MovementMapperTest {
         return mapper.toMovement(dto, UTENTE, IngestionSource.BUDGET_BAKERS, CONTI, CATEGORIE);
     }
 
-    private Builder record() {
+    private Builder movimento() {
         return new Builder();
     }
 

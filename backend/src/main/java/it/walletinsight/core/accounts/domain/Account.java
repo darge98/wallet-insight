@@ -153,7 +153,6 @@ public record Account(
         return trimmed;
     }
 
-    /** Un testo opzionale: bianco o vuoto diventa `null`, mai una stringa vuota persistita. */
     /**
      * Normalizza il colore a `#rrggbb` minuscolo, o a `null` se non ce n'è uno.
      *
@@ -173,6 +172,7 @@ public record Account(
         return trimmed.toLowerCase(Locale.ROOT);
     }
 
+    /** Un testo opzionale: bianco o vuoto diventa `null`, mai una stringa vuota persistita. */
     private static String optionalText(String value, String field, int maxLength) {
         if (value == null || value.trim().isEmpty()) {
             return null;

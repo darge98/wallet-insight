@@ -9,10 +9,10 @@ const PLAIN = /^\d+([.,]\d{1,2})?$/;
  * `null` se non è un importo positivo.
  */
 export function parseAmount(raw: string): number | null {
-  const text = raw.trim().replace(/\s|€/g, '');
+  const text = raw.trim().replaceAll(/\s|€/g, '');
   let normalized: string;
   if (GROUPED.test(text)) {
-    normalized = text.replace(/\./g, '').replace(',', '.');
+    normalized = text.replaceAll('.', '').replace(',', '.');
   } else if (PLAIN.test(text)) {
     normalized = text.replace(',', '.');
   } else {

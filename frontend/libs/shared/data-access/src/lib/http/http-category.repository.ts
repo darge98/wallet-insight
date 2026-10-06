@@ -59,7 +59,8 @@ export class HttpCategoryRepository implements CategoryRepository {
   }
 
   async remove(id: CategoryId, into: CategoryId | null, signal?: AbortSignal): Promise<void> {
-    const url = `${await this.url(signal)}/${id}${into ? `?into=${into}` : ''}`;
+    const query = into ? `?into=${into}` : '';
+    const url = `${await this.url(signal)}/${id}${query}`;
     // Un 204 non ha corpo: `requestJson` lo considererebbe un contratto rotto.
     await rejectingRules(
       new Promise<void>((resolve, reject) => {

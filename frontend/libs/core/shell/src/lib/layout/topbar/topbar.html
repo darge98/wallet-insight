@@ -17,14 +17,15 @@
 </nav>
 
 @if (importConnections.withRejectedCredentials().length > 0) {
-  <a
-    routerLink="/impostazioni/conti"
-    class="flex items-center gap-1.5 text-xs text-warning hover:underline"
-    role="status"
-  >
-    <app-icon name="alert" [size]="14" />
-    <span>Token da aggiornare</span>
-  </a>
+  <output>
+    <a
+      routerLink="/impostazioni/conti"
+      class="flex items-center gap-1.5 text-xs text-warning hover:underline"
+    >
+      <app-icon name="alert" [size]="14" />
+      <span>Token da aggiornare</span>
+    </a>
+  </output>
 } @else {
   <p class="hidden text-xs text-ink-muted sm:block" aria-live="polite">{{ lastRun() }}</p>
 }

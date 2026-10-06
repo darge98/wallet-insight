@@ -167,7 +167,7 @@ class MovementMapper {
     private long toCents(RecordDto dto) {
         BigDecimal value = dto.amount().value();
         int scale = value.stripTrailingZeros().scale();
-        if (scale > MINOR_UNIT_DIGITS) {
+        if (scale > MINOR_UNIT_DIGITS && log.isErrorEnabled()) {
             log.error("Movimento {}: importo {} {} ha {} decimali, piu' dei {} rappresentabili in centesimi. "
                             + "Arrotondato, ma il valore originale e' andato perso.",
                     dto.id(), value.toPlainString(), dto.amount().currencyCode(), scale, MINOR_UNIT_DIGITS);

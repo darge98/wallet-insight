@@ -37,8 +37,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getUser(UserId id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_TYPE, id.toString()));
+        return requireUser(id);
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +46,7 @@ public class UserService {
     }
 
     public User updateUser(UserId id, String firstName, String lastName, String email, UserSettings settings) {
-        User user = getUser(id).withProfile(firstName, lastName, email).withSettings(settings);
+        User user = requireUser(id).withProfile(firstName, lastName, email).withSettings(settings);
         repository.update(user);
         return user;
     }
@@ -60,12 +59,17 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserSettings getSettings(UserId id) {
-        return getUser(id).settings();
+        return requireUser(id).settings();
     }
 
     public User updateSettings(UserId id, UserSettings settings) {
-        User user = getUser(id).withSettings(settings);
+        User user = requireUser(id).withSettings(settings);
         repository.update(user);
         return user;
+    }
+
+    private User requireUser(UserId id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_TYPE, id.toString()));
     }
 }

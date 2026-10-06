@@ -1,7 +1,6 @@
-import { CategoryId, Money, moneyRatio } from '@wallet/shared-domain';
+import { CategoryId, Money, moneyRatio, YearMonth } from '@wallet/shared-domain';
 
 import { BudgetId } from './budget';
-import { YearMonth } from '@wallet/shared-domain';
 
 export interface CategorySpent {
   readonly categoryId: CategoryId;

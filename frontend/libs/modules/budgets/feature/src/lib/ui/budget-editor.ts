@@ -92,15 +92,17 @@ export class BudgetEditor {
 
   protected readonly budgetForm = form(this.model, budgetSchema, {
     submission: {
-      action: async () => {
-        if (this.overRoom()) return;
-        const { name, limit, categoryIds } = this.model();
-        this.saved.emit({
-          parentId: this.parent()?.id ?? null,
-          name: name.trim(),
-          categoryIds: categoryIds.map(asCategoryId),
-          limit: money(parseAmount(limit) ?? 0),
-        });
+      action: () => {
+        if (!this.overRoom()) {
+          const { name, limit, categoryIds } = this.model();
+          this.saved.emit({
+            parentId: this.parent()?.id ?? null,
+            name: name.trim(),
+            categoryIds: categoryIds.map(asCategoryId),
+            limit: money(parseAmount(limit) ?? 0),
+          });
+        }
+        return Promise.resolve();
       },
     },
   });
@@ -200,10 +202,14 @@ export class BudgetEditor {
       byGroup.set(label, options);
     }
 
+    for (const options of byGroup.values()) {
+      options.sort((a, b) => a.name.localeCompare(b.name, 'it'));
+    }
+
     return [...byGroup.entries()]
       .map(([label, options]) => ({
         label,
-        options: options.sort((a, b) => a.name.localeCompare(b.name, 'it')),
+        options,
         selected: options.filter((option) => selected.has(option.id)).length,
         available: options.filter((option) => option.takenBy === null).length,
       }))
