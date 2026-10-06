@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.walletinsight.core.accounts.domain.Account;
 import it.walletinsight.core.accounts.domain.AccountKind;
+import it.walletinsight.core.ingestion.infrastructure.budgetbakers.dto.AccountBalanceDto;
 import it.walletinsight.core.ingestion.infrastructure.budgetbakers.dto.AccountDto;
 import it.walletinsight.core.ingestion.infrastructure.budgetbakers.dto.AccountsPageDto;
 import it.walletinsight.core.users.domain.UserId;
@@ -12,6 +13,8 @@ import it.walletinsight.shared.money.Money;
 import it.walletinsight.shared.source.IngestionSource;
 
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -189,6 +192,17 @@ class AccountsPageDtoJsonTest {
 
         assertThat(mapper.toAccount(strano, UTENTE, IngestionSource.BUDGET_BAKERS).kind())
                 .isEqualTo(AccountKind.UNKNOWN);
+    }
+
+    @Test
+    void unSaldoConPiuDecimaliDeiCentesimiSiArrotondaAMeta() {
+        AccountDto millesimi = new AccountDto("acc-z", "Crypto", "CurrentAccount", "EUR",
+                false, null, false, false,
+                new AccountBalanceDto(new BigDecimal("10.005"), new BigDecimal("0.004"), "EUR", null),
+                null, null, null);
+
+        assertThat(mapper.toAccount(millesimi, UTENTE, IngestionSource.BUDGET_BAKERS).initialBalance())
+                .isEqualTo(Money.of(1_001L));
     }
 
     @Test

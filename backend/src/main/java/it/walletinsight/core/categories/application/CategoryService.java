@@ -156,12 +156,7 @@ public class CategoryService {
     }
 
     /** Una categoria su cui si può classificare un movimento: dell'utente e non una macro. */
-    @Transactional(readOnly = true)
-    public Category requireSubcategory(UserId userId, CategoryId id) {
-        return subcategory(userId, id);
-    }
-
-    private Category subcategory(UserId userId, CategoryId id) {
+    private Category requireSubcategory(UserId userId, CategoryId id) {
         Category categoria = requireCategory(userId, id);
         if (categoria.isMacro()) {
             throw new IllegalArgumentException(
@@ -186,7 +181,7 @@ public class CategoryService {
         requireUser(userId);
         SourceCategory prima = sources.findById(userId, id).orElseThrow(
                 () -> new ResourceNotFoundException(SOURCE_CATEGORY_RESOURCE_TYPE, id.toString()));
-        subcategory(userId, categoryId);
+        requireSubcategory(userId, categoryId);
         if (!categoryId.equals(prima.category())) {
             sources.update(prima.linkedTo(categoryId));
         }
