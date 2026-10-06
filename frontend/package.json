@@ -52,7 +52,7 @@
     "eslint-config-prettier": "^10.1.8",
     "jsdom": "^27.1.0",
     "jsonc-eslint-parser": "^3.3.0",
-    "nx": "23.2.0",
+    "nx": "23.2.1",
     "postcss": "^8.5.28",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.3.3",
