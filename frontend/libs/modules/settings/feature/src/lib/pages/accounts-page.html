@@ -1,0 +1,69 @@
+<h2 class="type-section text-ink">I tuoi conti</h2>
+
+<div class="mt-5 flex items-baseline justify-between gap-4">
+  <p class="text-sm text-ink-muted">
+    Totale <span class="tnum text-ink">{{ totalBalance() | money }}</span>
+  </p>
+  @if (facade.accounts.value().length > 0) {
+    <p class="text-xs text-ink-faint">{{ facade.accounts.value().length }} conti</p>
+  }
+</div>
+
+@if (facade.accounts.isLoading()) {
+  <div class="mt-3 grid gap-3 sm:grid-cols-2">
+    <app-skeleton class="h-20 w-full" />
+    <app-skeleton class="h-20 w-full" />
+  </div>
+} @else if (facade.accounts.value().length === 0) {
+  <app-empty-state class="mt-3 block" title="Nessun conto" />
+} @else {
+  <ul class="mt-3 grid gap-3 sm:grid-cols-2">
+    @for (account of facade.accounts.value(); track account.id) {
+      <li>
+        <app-account-card
+          [account]="account"
+          (renamedTo)="facade.rename(account.id, $event)"
+          (recoloredTo)="facade.recolor(account.id, $event)"
+        />
+      </li>
+    }
+  </ul>
+}
+
+<section class="mt-10" aria-labelledby="settings-sources-heading">
+  <h2 id="settings-sources-heading" class="type-section text-ink">Sorgenti</h2>
+
+  @if (facade.connections.isLoading()) {
+    <app-skeleton class="mt-3 h-24 w-full" />
+  } @else if (facade.connections.value().length === 0) {
+    <app-empty-state class="mt-3 block" title="Nessuna sorgente collegata" />
+  } @else {
+    <ul class="mt-3 grid gap-4 sm:grid-cols-2">
+      @for (connection of facade.connections.value(); track connection.source) {
+        <li class="rounded-card border border-line bg-surface p-4">
+          <app-source-status [connection]="connection" />
+          @if (connection.credentialsRejectedAt) {
+            <app-token-form
+              class="mt-4"
+              [fieldId]="'token-' + connection.source"
+              [saving]="facade.replacingToken() === connection.source"
+              (submitted)="facade.replaceToken(connection.source, $event)"
+            />
+          } @else {
+            <details class="mt-3">
+              <summary class="cursor-pointer text-xs text-ink-muted hover:text-ink">
+                Sostituisci il token
+              </summary>
+              <app-token-form
+                class="mt-3"
+                [fieldId]="'token-' + connection.source"
+                [saving]="facade.replacingToken() === connection.source"
+                (submitted)="facade.replaceToken(connection.source, $event)"
+              />
+            </details>
+          }
+        </li>
+      }
+    </ul>
+  }
+</section>

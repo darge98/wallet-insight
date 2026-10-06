@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: wallet-insight-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/margine
+    username: margine
+    password: margine
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    default-property-inclusion: non_null
+  mvc:
+    problemdetails:
+      enabled: true
+  modulith:
+    # I moduli sono i package annotati con @ApplicationModule a qualsiasi profondità:
+    # così i moduli di dominio vivono sotto `core/` senza appiattirsi accanto a
+    # shared e platform. Un package non annotato non è un modulo.
+    detection-strategy: explicitly-annotated
+
+margine:
+  # Chi puo' chiamare l'API da un browser. Vuota di default: nessuna origine
+  # esterna, e il CORS non viene nemmeno registrato. Va riempita per l'ambiente,
+  # mai qui dentro.
+  allowed-origins: []
+  budgetbakers:
+    base-url: https://rest.budgetbakers.com/wallet
+    # Elementi per pagina, massimo consentito dall'API. Sempre esplicito: senza,
+    # l'API ne restituisce una manciata (30 per specifica, 10 nella risposta
+    # osservata) senza segnalare nulla, e i conti oltre il limite sparirebbero.
+    page-size: 200
+    import:
+      # Ogni giorno alle 5:00; `-` spegne la schedulazione e l'import all'avvio.
+      cron: "0 0 5 * * *"
+      zone: Europe/Rome
+  encryption:
+    # Chiave AES-256 in base64 (32 byte) con cui vengono cifrati i segreti delle
+    # connessioni di importazione: `openssl rand -base64 32`.
+    # Nessun valore predefinito e nessuna chiave nel repository: ogni istanza ha la
+    # propria, così un database sottratto non basta a leggere i token e violarne una
+    # non le viola tutte. Se manca, l'applicazione non parte.
+    key: ${ENCRYPTION_KEY:}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  flyway:
+    locations: classpath:db/migration
+
+margine:
+  # Solo il dev server Angular. Non `*`: l'API non ha autenticazione, e con `*`
+  # qualunque pagina aperta nel browser potrebbe leggere e scrivere i dati su
+  # localhost:8080. Swagger e curl non passano dal CORS.
+  allowed-origins:
+    - 'http://localhost:4200'

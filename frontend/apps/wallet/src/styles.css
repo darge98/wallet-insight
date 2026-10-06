@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import '../../../libs/shared/ui/src/styles/design-system.css';
+
+/*
+ * Sorgenti esplicite: Tailwind deve vedere le classi usate nelle librerie, non
+ * solo quelle dell'applicazione. Elencarle evita anche la scansione di
+ * node_modules e rende la build riproducibile.
+ */
+@source './**/*.{html,ts}';
+@source '../../../libs/**/*.{html,ts}';

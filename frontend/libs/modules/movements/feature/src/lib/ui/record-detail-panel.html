@@ -1,0 +1,166 @@
+@if (record(); as detail) {
+  <div class="fixed inset-0 z-40 flex justify-end">
+    <button
+      type="button"
+      class="absolute inset-0 bg-ink/25"
+      aria-label="Chiudi il dettaglio"
+      (click)="closed.emit()"
+    ></button>
+
+    <aside
+      class="fade-in app-scroll relative flex h-full w-full max-w-sm flex-col overflow-y-auto border-l border-line bg-surface px-7 py-7"
+      role="dialog"
+      aria-label="Dettaglio movimento"
+    >
+      <header class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="type-section truncate text-ink">{{ title() }}</p>
+          <p class="mt-0.5 text-xs text-ink-muted">{{ detail.date | dayLabel: 'long' }}</p>
+        </div>
+        <button
+          type="button"
+          class="btn btn-icon -mt-1.5 -mr-2 shrink-0"
+          aria-label="Chiudi"
+          (click)="closed.emit()"
+        >
+          <app-icon name="close" [size]="16" />
+        </button>
+      </header>
+
+      <p class="tnum type-figure mt-6" [class]="amountTone()">
+        {{ detail.amount | money: 'signed' }}
+      </p>
+
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        <app-badge [tone]="detail.type === 'expense' ? 'neutral' : 'accent'">
+          {{ typeLabel() }}
+        </app-badge>
+        @if (pending()) {
+          <app-badge tone="neutral">In attesa di contabilizzazione</app-badge>
+        }
+      </div>
+
+      @if (pending()) {
+        <!--
+          Niente modulo: tre caselle spente che non si possono usare dicono meno
+          di tre valori scritti com'erano. A dire perché bastano il badge in alto
+          — «In attesa di contabilizzazione» — e l'assenza stessa dei campi.
+        -->
+        <!--
+          Etichetta sopra e valore a tutta larghezza, come nel modulo qui accanto:
+          sono gli stessi tre campi, e devono avere la stessa forma che si possano
+          correggere o no. Non è solo coerenza — affiancati, al valore restavano
+          198 px dei 319 del pannello, e la descrizione di un movimento non
+          contabilizzato è il tracciato della banca: 126 caratteri, che diventano
+          sette righe allineate a destra. A tutta larghezza e a sinistra sono
+          quattro, e si leggono dall'inizio come qualunque altro testo.
+        -->
+        <dl class="mt-8 flex flex-col gap-5 opacity-70">
+          <div>
+            <dt class="text-xs font-medium text-ink-muted">{{ counterPartyLabel() }}</dt>
+            <dd class="mt-1.5 text-sm break-words text-ink-muted">
+              {{ detail.counterParty ?? '—' }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-ink-muted">Descrizione</dt>
+            <dd class="mt-1.5 text-sm break-words text-ink-muted">
+              {{ detail.description ?? '—' }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-ink-muted">Categoria</dt>
+            <dd class="mt-1.5 text-sm break-words text-ink-muted">
+              {{ category()?.name ?? '—' }}
+            </dd>
+          </div>
+        </dl>
+      } @else {
+        <!--
+          Importo, data, verso e stato non sono qui: arrivano dall'esterno e ogni
+          aggiornamento li riscrive. Un campo che promette una modifica che il
+          prossimo aggiornamento cancella è peggio di un campo che non c'è.
+        -->
+        <form [formRoot]="editForm" class="mt-8 flex flex-col gap-5">
+          <div>
+            <label class="block text-xs font-medium text-ink-muted" for="movement-counter-party">
+              {{ counterPartyLabel() }}
+            </label>
+            <input
+              id="movement-counter-party"
+              type="text"
+              placeholder="Una persona, un negozio"
+              [formField]="editForm.counterParty"
+              class="field mt-1.5"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-ink-muted" for="movement-description">
+              Descrizione
+            </label>
+            <textarea
+              id="movement-description"
+              rows="3"
+              [formField]="editForm.description"
+              class="field app-scroll mt-1.5 resize-y"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-ink-muted" for="movement-category">
+              Categoria
+            </label>
+            <select id="movement-category" [formField]="editForm.category" class="field mt-1.5">
+              @if (withoutCategory()) {
+                <option [value]="noCategory">Senza categoria</option>
+              }
+              @for (group of categoryGroups(); track group.label) {
+                <optgroup [label]="group.label">
+                  @for (option of group.categories; track option.id) {
+                    <option [value]="option.id">{{ option.name }}</option>
+                  }
+                </optgroup>
+              }
+            </select>
+          </div>
+
+          @if (saveFailed()) {
+            <p class="text-xs text-negative">Salvataggio non riuscito. Riprova.</p>
+          }
+
+          <button type="submit" class="btn btn-primary w-fit" [disabled]="saving() || !dirty()">
+            {{ saving() ? 'Salvataggio…' : 'Salva' }}
+          </button>
+        </form>
+      }
+
+      <!-- Solo per le uscite: il movimento diventa il primo addebito dell'abbonamento. -->
+      @if (detail.type === 'expense') {
+        <div class="mt-8 border-t border-line pt-6">
+          @if (subscribed()) {
+            <p class="flex flex-wrap items-center gap-x-2 text-sm text-ink">
+              <app-icon name="check" [size]="14" class="text-accent" />
+              Aggiunto agli abbonamenti.
+              <a routerLink="/abbonamenti" class="btn btn-text">Vedi</a>
+            </p>
+          } @else {
+            <button type="button" class="btn btn-secondary" (click)="subscribe.emit()">
+              <app-icon name="plus" [size]="14" />
+              Aggiungi agli abbonamenti
+            </button>
+          }
+        </div>
+      }
+
+      <dl class="mt-8 flex flex-col gap-4 border-t border-line pt-6">
+        @for (row of rows(); track row.label) {
+          <div class="flex items-start justify-between gap-6">
+            <dt class="text-sm text-ink-muted">{{ row.label }}</dt>
+            <dd class="max-w-[62%] text-right text-sm break-words text-ink">{{ row.value }}</dd>
+          </div>
+        }
+      </dl>
+    </aside>
+  </div>
+}

@@ -1,0 +1,39 @@
+<button
+  type="button"
+  class="btn btn-icon -ml-2 lg:hidden"
+  aria-label="Apri il menu di navigazione"
+  (click)="menuOpened.emit()"
+>
+  <app-icon name="menu" [size]="18" />
+</button>
+
+<nav
+  class="flex min-w-0 flex-1 items-baseline gap-1.5 text-sm text-ink-muted"
+  aria-label="Percorso"
+>
+  <span>Personale</span>
+  <span class="text-ink-faint" aria-hidden="true">/</span>
+  <span class="truncate text-ink">{{ section() }}</span>
+</nav>
+
+@if (importConnections.withRejectedCredentials().length > 0) {
+  <a
+    routerLink="/impostazioni/conti"
+    class="flex items-center gap-1.5 text-xs text-warning hover:underline"
+    role="status"
+  >
+    <app-icon name="alert" [size]="14" />
+    <span>Token da aggiornare</span>
+  </a>
+} @else {
+  <p class="hidden text-xs text-ink-muted sm:block" aria-live="polite">{{ lastRun() }}</p>
+}
+
+<button
+  type="button"
+  class="btn btn-icon -mr-2"
+  [attr.aria-label]="theme.isDark() ? 'Passa al tema chiaro' : 'Passa al tema scuro'"
+  (click)="theme.toggle()"
+>
+  <app-icon [name]="theme.isDark() ? 'sun' : 'moon'" [size]="16" />
+</button>

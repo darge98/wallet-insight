@@ -1,0 +1,28 @@
+<!-- Sidebar persistente (desktop) -->
+<aside class="hidden shrink-0 lg:block">
+  <div class="sticky top-0 h-screen">
+    <app-sidebar />
+  </div>
+</aside>
+
+<!-- Drawer (mobile) -->
+@if (drawerOpen()) {
+  <div class="fixed inset-0 z-40 lg:hidden">
+    <button
+      type="button"
+      class="absolute inset-0 bg-ink/25"
+      aria-label="Chiudi il menu di navigazione"
+      (click)="closeDrawer()"
+    ></button>
+    <div class="fade-in relative h-full w-64 border-r border-line">
+      <app-sidebar (navigated)="closeDrawer()" />
+    </div>
+  </div>
+}
+
+<div class="flex min-w-0 flex-1 flex-col px-6 py-8 lg:px-12">
+  <app-topbar [section]="sectionLabel()" (menuOpened)="openDrawer()" />
+  <main class="mt-10 min-w-0 flex-1">
+    <router-outlet />
+  </main>
+</div>

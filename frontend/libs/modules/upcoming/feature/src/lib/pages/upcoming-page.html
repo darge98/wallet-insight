@@ -1,0 +1,53 @@
+<header class="max-w-2xl">
+  <app-badge tone="accent">In arrivo</app-badge>
+  <h1 class="type-display mt-4 text-ink">{{ content().title }}</h1>
+  <p class="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted">{{ content().intro }}</p>
+
+  <div class="mt-6 flex flex-wrap gap-2">
+    <a routerLink="/panoramica" class="btn btn-primary">
+      Torna alla panoramica
+      <app-icon name="arrow-right" [size]="15" />
+    </a>
+    <a routerLink="/movimenti" class="btn btn-secondary"> Intanto guarda i movimenti </a>
+  </div>
+</header>
+
+<div class="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
+  <section aria-labelledby="upcoming-capabilities">
+    <h2 id="upcoming-capabilities" class="type-eyebrow text-ink-faint">Cosa potrai fare</h2>
+
+    <div class="mt-5 grid gap-x-10 gap-y-7 sm:grid-cols-2">
+      @for (capability of content().capabilities; track capability.title) {
+        <article>
+          <h3 class="text-sm font-medium text-ink">{{ capability.title }}</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ink-muted">{{ capability.description }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="upcoming-roadmap">
+    <h2 id="upcoming-roadmap" class="type-eyebrow text-ink-faint">Stato di avanzamento</h2>
+
+    <ol class="mt-5 flex flex-col gap-5">
+      @for (step of content().roadmap; track step.title) {
+        <li class="flex gap-3">
+          <span
+            class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full"
+            [class]="step.done ? 'bg-soft text-accent' : 'border border-line text-ink-faint'"
+            aria-hidden="true"
+          >
+            <app-icon [name]="step.done ? 'check' : 'clock'" [size]="12" [strokeWidth]="2.2" />
+          </span>
+          <div class="min-w-0">
+            <p class="text-sm text-ink">
+              {{ step.title }}
+              <span class="text-ink-faint">{{ step.done ? '· completato' : '· pianificato' }}</span>
+            </p>
+            <p class="mt-0.5 text-xs leading-relaxed text-ink-muted">{{ step.detail }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </section>
+</div>

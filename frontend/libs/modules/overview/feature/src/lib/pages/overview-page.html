@@ -1,0 +1,137 @@
+<!--
+  La barra del periodo sta sulla riga sotto, la sua: undici periodi misurano
+  918 px, e accanto a un sottotitolo che al naturale ne misura 477 non ci
+  starebbero a nessuna larghezza plausibile. È anche la stessa barra dei
+  Movimenti, e questa intestazione è ora la stessa: titolo, sottotitolo, niente
+  comandi a fianco.
+-->
+<header class="max-w-xl">
+  <h1 class="type-display text-ink">Panoramica</h1>
+</header>
+
+<app-period-filter-bar
+  class="mt-5 block"
+  label="Periodo di analisi"
+  [period]="facade.period()"
+  [range]="facade.range()"
+  (periodChange)="onPeriodChange($event)"
+  (customRangeChange)="facade.setCustomRange($event)"
+/>
+
+@if (facade.hasError()) {
+  <app-alert class="mt-6" message="Alcuni dati non sono stati caricati." />
+}
+
+<!--
+  Due colonne sul telefono, quattro da `lg`. La grondaia scende da 40 px a 20:
+  su 327 px di contenuto quaranta erano il 12% della larghezza tolto proprio
+  alle cifre, che sono la ragione per cui si guarda questo blocco.
+
+  Sotto i 360 px le colonne diventano una sola. È la soglia oltre la quale
+  nemmeno una cifra rimpicciolita ci sta: un saldo a sei cifre misura 138 px
+  contro i 126 della colonna, e non può andare a capo. Sotto quella larghezza
+  si impilano, che è anche ciò che chiede il criterio di reflow a 320 px —
+  scorrere in due direzioni per leggere un numero non è una lettura.
+-->
+<section
+  class="mt-8 grid grid-cols-2 gap-x-5 gap-y-7 max-[359px]:grid-cols-1 sm:mt-10 sm:gap-x-10 sm:gap-y-8 lg:grid-cols-4"
+  aria-label="Indicatori principali"
+>
+  <app-kpi-block
+    label="Saldo complessivo"
+    [value]="facade.summary.value()?.netWorth"
+    [detail]="balanceDetail()"
+    [loading]="facade.summary.isLoading()"
+  />
+  <app-kpi-block
+    label="Entrate del periodo"
+    [value]="facade.summary.value()?.income"
+    [detail]="incomeDetail()"
+    [loading]="facade.summary.isLoading()"
+  />
+  <app-kpi-block
+    label="Uscite del periodo"
+    [value]="facade.summary.value()?.expenses"
+    [detail]="expensesDetail()"
+    [loading]="facade.summary.isLoading()"
+  />
+  <app-kpi-block
+    label="Margine del periodo"
+    [value]="facade.summary.value()?.net"
+    [detail]="marginDetail()"
+    [highlight]="true"
+    [loading]="facade.summary.isLoading()"
+  />
+</section>
+
+<!--
+  `grid-cols-1` non è ridondante: senza, sotto `lg` la griglia usa una colonna
+  implicita `auto`, che si dimensiona sul max-content del contenuto. Il canvas
+  di ECharts ha una larghezza intrinseca in pixel, quindi la colonna si allarga
+  fino a contenerlo e la pagina prende lo scorrimento orizzontale — che poi non
+  se ne va più, perché il contenitore non si restringe mai e il ridimensionamento
+  automatico del grafico non riparte. `grid-cols-1` è `minmax(0,1fr)`: mette il
+  minimo a zero, come già fa la definizione a due colonne da `lg` in su. È anche
+  il motivo per cui il problema si vedeva solo in portrait.
+-->
+<div
+  class="mt-8 grid grid-cols-1 items-start gap-5 lg:items-stretch sm:mt-10 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]"
+>
+  <!-- Su telefono un grafico solo: dove finiscono i soldi dice cosa fare, la curva
+       chiede una larghezza che lì non c'è. -->
+  <app-card class="max-sm:hidden" heading="Come sono cresciute le spese">
+    <span cardActions>{{ facade.periodLabel() }}</span>
+    <app-expense-curve-chart
+      [points]="facade.expenseCurve.value()"
+      [range]="facade.range()"
+      [loading]="facade.expenseCurve.isLoading()"
+    />
+  </app-card>
+
+  <app-card heading="Dove finiscono i soldi">
+    <span cardActions>{{ facade.periodLabel() }}</span>
+    <app-category-structure-chart
+      [entries]="expenseStructure()"
+      [total]="facade.summary.value()?.expenses"
+      [loading]="facade.categoryExpenses.isLoading()"
+    />
+  </app-card>
+
+  <!-- Senza budget la sezione non c'è: non ha niente da riassumere. -->
+  @if (facade.budgets().length > 0) {
+    <section class="mt-2 lg:col-span-2" aria-labelledby="budgets-heading">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 id="budgets-heading" class="type-section text-ink">
+          Budget <span class="text-ink-muted">· {{ budgetMonthLabel() }}</span>
+        </h2>
+        <a routerLink="/budget" class="btn btn-text">
+          Vedi tutti
+          <app-icon name="arrow-right" [size]="15" />
+        </a>
+      </div>
+
+      <ul class="mt-4 grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
+        @for (budget of facade.budgets(); track budget.id) {
+          <li><app-budget-meter [status]="budget" /></li>
+        }
+      </ul>
+    </section>
+  }
+
+  <section class="mt-2 lg:col-span-2" aria-labelledby="recent-records-heading">
+    <div class="flex items-baseline justify-between gap-4">
+      <h2 id="recent-records-heading" class="type-section text-ink">Ultimi movimenti</h2>
+      <a routerLink="/movimenti" class="btn btn-text">
+        Vedi tutti
+        <app-icon name="arrow-right" [size]="15" />
+      </a>
+    </div>
+
+    <app-recent-records-list
+      class="mt-4 block"
+      [records]="facade.records()"
+      [categories]="facade.categories.value()"
+      [loading]="facade.recentRecords.isLoading()"
+    />
+  </section>
+</div>

@@ -1,0 +1,17 @@
+<header class="max-w-xl">
+  <h1 class="type-display text-ink">Impostazioni</h1>
+</header>
+
+@if (facade.failure(); as failure) {
+  <!-- Sta nel guscio e non nelle singole pagine: un salvataggio fallito mentre si
+       cambia scheda non deve sparire prima di essere stato letto. -->
+  <app-alert class="mt-6" [message]="failure" />
+}
+
+<div class="mt-8 grid items-start gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-10">
+  <app-settings-nav [sections]="sections" class="lg:sticky lg:top-8" />
+
+  <div class="min-w-0">
+    <router-outlet />
+  </div>
+</div>

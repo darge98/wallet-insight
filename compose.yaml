@@ -1,0 +1,62 @@
+# Stack completo del monorepo Wallet Insights: PostgreSQL + backend Spring Boot +
+# frontend Angular, tutti containerizzati, pensato per l'uso locale da browser.
+#
+# I valori arrivano da .env, che Compose legge da solo perche' sta accanto a
+# questo file. I default dopo `:-` fanno funzionare lo stack anche senza .env.
+#
+# Per sviluppare il solo backend con `bootRun` in locale continua a esistere
+# backend/compose.yaml (solo Postgres): questo file resta indipendente.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-margine}
+      POSTGRES_USER: ${POSTGRES_USER:-margine}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-margine}
+    # Solo su localhost: l'API non ha autenticazione e il database ha una password
+    # di default, quindi nessuno dei due deve essere raggiungibile dalla rete.
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - margine-db:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-margine} -d ${POSTGRES_DB:-margine}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-margine}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-margine}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-margine}
+      # Senza chiave il backend non parte, di proposito: e' cio' con cui cifra i
+      # token delle sorgenti. Niente default dopo `:?`, altrimenti un'istanza
+      # partirebbe con una chiave nota e i segreti sarebbero cifrati per finta;
+      # e cambiarla rende illeggibili le credenziali gia' salvate. Compose si
+      # ferma qui con questo messaggio invece di far ripartire in loop un
+      # container che muore su uno stack trace Java.
+      ENCRYPTION_KEY: '${ENCRYPTION_KEY:?va impostata in .env, generala con openssl rand -base64 32}'
+    # Nessun profilo e quindi nessun CORS: nginx serve frontend e /api/ dalla stessa
+    # origine. La porta resta aperta su localhost per gli import chiesti a mano.
+    ports:
+      - '127.0.0.1:8080:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '8081:80'
+    depends_on:
+      - backend
+
+volumes:
+  margine-db:

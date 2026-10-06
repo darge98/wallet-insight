@@ -1,0 +1,12 @@
+node_modules/
+dist/
+tmp/
+out-tsc/
+.angular/
+.nx/
+.git/
+.idea/
+.vscode/
+coverage/
+__screenshots__/
+*.log

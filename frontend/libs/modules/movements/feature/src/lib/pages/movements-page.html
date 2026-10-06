@@ -1,0 +1,120 @@
+<header class="max-w-xl">
+  <h1 class="type-display text-ink">Movimenti</h1>
+</header>
+
+<app-period-filter-bar
+  class="mt-8 block"
+  label="Periodo dei movimenti"
+  [period]="facade.period()"
+  [range]="facade.range()"
+  (periodChange)="onPeriod($event)"
+  (customRangeChange)="onCustomRange($event)"
+/>
+
+@if (facade.accountId(); as accountId) {
+  <!-- Il conto arriva dalla sidebar e non ha un controllo qui: si toglie
+       tornando all'elenco intero, che è anche ciò che fa «indietro». -->
+  <p class="mt-4 flex flex-wrap items-center gap-2 text-sm text-ink-muted">
+    Solo il conto
+    <span
+      class="inline-flex items-center gap-1 rounded-full bg-soft py-0.5 pr-1 pl-2.5 text-accent"
+    >
+      <span class="font-medium">{{ facade.account()?.name ?? 'selezionato' }}</span>
+      <a
+        routerLink="/movimenti"
+        class="hit-area inline-flex rounded-full p-1 transition-colors hover:bg-surface"
+        aria-label="Mostra i movimenti di tutti i conti"
+      >
+        <app-icon name="close" [size]="12" />
+      </a>
+    </span>
+  </p>
+}
+
+<app-movements-summary class="mt-9" [totals]="facade.totals()" [loading]="facade.isLoading()" />
+
+<!--
+  `grid-cols-1` mette a zero il minimo della colonna sotto `lg`, dove non c'è
+  una definizione esplicita: una traccia implicita è `auto` e si dimensiona sul
+  max-content di ciò che contiene, quindi basta un elemento con una larghezza
+  intrinseca per far debordare la pagina. Da `lg` in su ci pensa già `minmax(0,…)`.
+-->
+<div class="mt-8 grid grid-cols-1 items-start gap-10 sm:mt-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
+  <!--
+    Il riepilogo sta *prima* dell'elenco nel documento, ed è l'ordine con cui si
+    legge su un telefono: è il riassunto del periodo, e viene prima del
+    dettaglio. Da `lg` in su `order-last` lo rimanda nella colonna di destra,
+    dove stava. La divergenza fra ordine del documento e ordine visivo costa
+    poco qui: le classifiche non contengono niente su cui si possa arrivare col
+    tabulatore, quindi l'ordine di navigazione da tastiera non cambia, e chi usa
+    uno screen reader salta fra i due punti di riferimento — «Riepilogo del
+    periodo» ed «Elenco movimenti» — invece di scorrerli in fila.
+  -->
+  <aside class="flex flex-col gap-5 lg:order-last lg:gap-9" aria-label="Riepilogo del periodo">
+    <app-collapsible-section heading="Uscite per categoria" headingId="breakdown-categories">
+      <app-breakdown-list
+        [entries]="categoryEntries()"
+        [loading]="facade.categoryBreakdown.isLoading()"
+      />
+    </app-collapsible-section>
+
+    <app-collapsible-section heading="Dove spendi di più" headingId="breakdown-counter-parties">
+      <app-breakdown-list
+        [entries]="counterPartyEntries()"
+        emptyTitle="Nessuna spesa con una controparte"
+        [loading]="facade.spendingTargets.isLoading()"
+      />
+    </app-collapsible-section>
+  </aside>
+
+  <section aria-label="Elenco movimenti">
+    <app-movements-list
+      [groups]="facade.groups()"
+      [categoryById]="facade.categoryById()"
+      [accountById]="facade.accountById()"
+      [selectedId]="facade.selectedRecord()?.id ?? null"
+      [loading]="facade.isLoading()"
+      (selected)="onSelect($event)"
+    />
+
+    @if (facade.pageCount() > 1) {
+      <div class="mt-8 border-t border-line pt-4">
+        <app-pagination-control
+          [index]="facade.pageIndex()"
+          [pageCount]="facade.pageCount()"
+          [pageSize]="facade.pageSize()"
+          [total]="facade.totalCount()"
+          (pageChange)="facade.goToPage($event)"
+        />
+      </div>
+    }
+  </section>
+</div>
+
+<app-record-detail-panel
+  [record]="facade.selectedRecord()"
+  [category]="selectedCategory()"
+  [account]="selectedAccount()"
+  [categories]="facade.categories.value()"
+  [saving]="facade.saving()"
+  [saveFailed]="facade.saveFailure() !== null"
+  [subscribed]="facade.selectedSubscribed()"
+  (closed)="facade.select(null)"
+  (saved)="onSave($event)"
+  (subscribe)="facade.startSubscription()"
+/>
+
+<!-- Dopo il dettaglio nel documento: si apre sopra di lui, che resta sotto. -->
+@if (facade.subscriptionDraft(); as draft) {
+  <app-subscription-editor
+    [open]="true"
+    [prefill]="draft"
+    [today]="draft.startDate"
+    [categories]="facade.categories.value()"
+    [accounts]="facade.accounts()"
+    [saving]="facade.subscriptionSaving()"
+    [error]="facade.subscriptionError()"
+    (closed)="facade.closeSubscription()"
+    (saved)="onSaveSubscription($event)"
+  />
+}

@@ -1,0 +1,247 @@
+@if (open()) {
+  <div class="fixed inset-0 z-40 flex justify-end">
+    <button
+      type="button"
+      class="absolute inset-0 bg-ink/25"
+      aria-label="Chiudi senza salvare"
+      (click)="closed.emit()"
+    ></button>
+
+    <aside
+      class="fade-in app-scroll relative flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-line bg-surface px-7 py-7"
+      role="dialog"
+      [attr.aria-label]="title()"
+    >
+      <header class="flex items-start justify-between gap-4">
+        <p class="type-section min-w-0 text-ink">{{ title() }}</p>
+        <button
+          type="button"
+          class="btn btn-icon -mt-1.5 -mr-2 shrink-0"
+          aria-label="Chiudi"
+          (click)="closed.emit()"
+        >
+          <app-icon name="close" [size]="16" />
+        </button>
+      </header>
+
+      <form [formRoot]="subscriptionForm" class="mt-6 flex flex-col gap-5">
+        <div>
+          <label class="block text-xs font-medium text-ink-muted" for="subscription-name">
+            Nome
+          </label>
+          <input
+            id="subscription-name"
+            type="text"
+            placeholder="Netflix"
+            [formField]="subscriptionForm.name"
+            [attr.aria-invalid]="showError('name')"
+            class="field mt-1.5"
+          />
+          @if (showError('name')) {
+            <p class="mt-1 text-xs text-negative">
+              {{
+                subscriptionForm.name().getError('too-long')
+                  ? 'Al massimo 80 caratteri.'
+                  : 'Campo obbligatorio.'
+              }}
+            </p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-ink-muted" for="subscription-amount">
+            Importo di ogni addebito
+          </label>
+          <div class="relative mt-1.5">
+            <input
+              id="subscription-amount"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="13,99"
+              [formField]="subscriptionForm.amount"
+              [attr.aria-invalid]="showError('amount')"
+              class="field tnum pr-8"
+            />
+            <span
+              class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-ink-faint"
+              >€</span
+            >
+          </div>
+          @if (showError('amount')) {
+            <p class="mt-1 text-xs text-negative">Importo non valido.</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-ink-muted" for="subscription-frequency">
+            Si rinnova
+          </label>
+          <select
+            id="subscription-frequency"
+            [formField]="subscriptionForm.frequency"
+            class="field mt-1.5"
+          >
+            @for (preset of presets; track preset.value) {
+              <option [value]="preset.value">{{ preset.label }}</option>
+            }
+            <option value="custom">Altra cadenza…</option>
+          </select>
+
+          @if (isCustom()) {
+            <div class="mt-2 flex items-center gap-2">
+              <span class="text-sm text-ink-muted">Ogni</span>
+              <input
+                type="text"
+                inputmode="numeric"
+                aria-label="Quante unità fra un addebito e l'altro"
+                [formField]="subscriptionForm.every"
+                [attr.aria-invalid]="showError('every')"
+                class="field tnum w-16"
+              />
+              <select
+                aria-label="Unità della cadenza"
+                [formField]="subscriptionForm.unit"
+                class="field flex-1"
+              >
+                @for (unit of units; track unit) {
+                  <option [value]="unit">{{ unitLabel(unit) }}</option>
+                }
+              </select>
+            </div>
+            @if (showError('every')) {
+              <p class="mt-1 text-xs text-negative">Valore da 1 a 99.</p>
+            }
+          }
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-3">
+          <div class="min-w-0">
+            <label class="block text-xs font-medium text-ink-muted" for="subscription-category">
+              Categoria
+            </label>
+            <select
+              id="subscription-category"
+              [formField]="subscriptionForm.categoryId"
+              class="field mt-1.5"
+            >
+              <option value="">Nessuna</option>
+              @for (group of categoryGroups(); track group.macro.id) {
+                <optgroup [label]="group.macro.name">
+                  @for (category of group.children; track category.id) {
+                    <option [value]="category.id">{{ category.name }}</option>
+                  }
+                </optgroup>
+              }
+            </select>
+          </div>
+          <div class="min-w-0">
+            <label class="block text-xs font-medium text-ink-muted" for="subscription-account">
+              Addebitato su
+            </label>
+            <select
+              id="subscription-account"
+              [formField]="subscriptionForm.accountId"
+              class="field mt-1.5"
+            >
+              <option value="">Nessun conto</option>
+              @for (account of accounts(); track account.id) {
+                <option [value]="account.id">{{ account.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-ink-muted" for="subscription-start">
+            Primo addebito
+          </label>
+          <input
+            id="subscription-start"
+            type="date"
+            [formField]="subscriptionForm.startDate"
+            [attr.aria-invalid]="showError('startDate')"
+            [attr.aria-describedby]="showError('startDate') ? 'subscription-start-error' : null"
+            class="field mt-1.5"
+          />
+          @if (showError('startDate')) {
+            <p id="subscription-start-error" class="mt-1 text-xs text-negative">
+              Indica la data del primo addebito.
+            </p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-ink-muted" for="subscription-end">
+            Data di fine
+            <span class="font-normal text-ink-faint">· facoltativa</span>
+          </label>
+          <input
+            id="subscription-end"
+            type="date"
+            [formField]="subscriptionForm.endDate"
+            [attr.aria-invalid]="showError('endDate')"
+            [attr.aria-describedby]="showError('endDate') ? 'subscription-end-error' : null"
+            class="field mt-1.5"
+          />
+          @if (showError('endDate')) {
+            <p id="subscription-end-error" class="mt-1 text-xs text-negative">
+              Deve seguire il primo addebito.
+            </p>
+          }
+        </div>
+
+        @if (error(); as message) {
+          <p class="text-xs text-negative" role="alert">{{ message }}</p>
+        }
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="saving()"
+            (click)="attempted.set(true)"
+          >
+            {{ saving() ? 'Salvataggio…' : subscription() ? 'Salva' : 'Aggiungi abbonamento' }}
+          </button>
+          <button type="button" class="btn btn-text text-sm" (click)="closed.emit()">
+            Annulla
+          </button>
+        </div>
+      </form>
+
+      @if (subscription(); as current) {
+        <div class="mt-auto border-t border-line pt-6">
+          @if (confirmingDelete()) {
+            <p class="text-sm text-ink">Eliminare «{{ current.name }}»?</p>
+            <div class="mt-3 flex gap-3">
+              <button
+                type="button"
+                class="btn btn-danger"
+                [disabled]="saving()"
+                (click)="removed.emit()"
+              >
+                Elimina
+              </button>
+              <button
+                type="button"
+                class="btn btn-text text-sm"
+                (click)="confirmingDelete.set(false)"
+              >
+                Annulla
+              </button>
+            </div>
+          } @else {
+            <button
+              type="button"
+              class="btn btn-text text-sm hover:text-negative"
+              (click)="confirmingDelete.set(true)"
+            >
+              Elimina abbonamento
+            </button>
+          }
+        </div>
+      }
+    </aside>
+  </div>
+}

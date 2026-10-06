@@ -1,0 +1,1 @@
+Leggi @AGENTS.md

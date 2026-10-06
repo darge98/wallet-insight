@@ -1,0 +1,253 @@
+<div
+  class="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-10 px-6 py-10 lg:grid lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-16 lg:py-16"
+>
+  <header class="lg:pr-8">
+    <div class="flex items-start justify-between gap-4">
+      <p class="type-eyebrow text-accent">
+        {{ copy().eyebrow }} · {{ stepPosition() }}/{{ totalSteps }}
+      </p>
+      <button
+        type="button"
+        class="cursor-pointer rounded-control border border-line p-1.5 text-ink-muted transition-colors hover:text-ink"
+        [attr.aria-label]="copy().themeToggle"
+        [title]="copy().themeToggle"
+        (click)="theme.toggle()"
+      >
+        <app-icon [name]="theme.isDark() ? 'sun' : 'moon'" [size]="16" />
+      </button>
+    </div>
+    <h1 class="type-display mt-3 text-ink">{{ stepCopy().title }}</h1>
+
+    <app-wizard-steps
+      class="mt-8"
+      [steps]="wizardSteps()"
+      [current]="step()"
+      [label]="copy().stepsLabel"
+    />
+
+    <div class="mt-8">
+      <app-segmented-control
+        [options]="languages"
+        [value]="language()"
+        (valueChange)="setLanguage($event)"
+        [label]="copy().languageLabel"
+      />
+    </div>
+  </header>
+
+  @if (step() === 'profile') {
+    <form
+      class="fade-in rounded-card border border-line bg-surface p-6 sm:p-8"
+      [formRoot]="profileForm"
+    >
+      <section aria-labelledby="onboarding-identity">
+        <h2 id="onboarding-identity" class="type-section text-ink">
+          {{ copy().identityHeading }}
+        </h2>
+
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-1">
+            <label class="block text-xs font-medium text-ink-muted" for="firstName">
+              {{ copy().firstNameLabel }}
+            </label>
+            <input
+              id="firstName"
+              type="text"
+              [formField]="profileForm.firstName"
+              autocomplete="given-name"
+              [attr.aria-invalid]="shows(profileForm.firstName())"
+              [attr.aria-describedby]="shows(profileForm.firstName()) ? 'firstName-error' : null"
+              class="field mt-1.5"
+            />
+            @if (shows(profileForm.firstName())) {
+              <p id="firstName-error" class="mt-1.5 text-xs text-negative">
+                {{ copy().requiredError }}
+              </p>
+            }
+          </div>
+
+          <div class="sm:col-span-1">
+            <label class="block text-xs font-medium text-ink-muted" for="lastName">
+              {{ copy().lastNameLabel }}
+              <span class="font-normal text-ink-faint">· {{ copy().optionalTag }}</span>
+            </label>
+            <input
+              id="lastName"
+              type="text"
+              [formField]="profileForm.lastName"
+              autocomplete="family-name"
+              [attr.aria-invalid]="shows(profileForm.lastName())"
+              [attr.aria-describedby]="shows(profileForm.lastName()) ? 'lastName-error' : null"
+              class="field mt-1.5"
+            />
+            @if (shows(profileForm.lastName())) {
+              <p id="lastName-error" class="mt-1.5 text-xs text-negative">
+                {{ copy().tooLongError }}
+              </p>
+            }
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-ink-muted" for="email">
+              {{ copy().emailLabel }}
+              <span class="font-normal text-ink-faint">· {{ copy().optionalTag }}</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              [formField]="profileForm.email"
+              autocomplete="email"
+              inputmode="email"
+              [placeholder]="copy().emailPlaceholder"
+              [attr.aria-invalid]="shows(profileForm.email())"
+              [attr.aria-describedby]="shows(profileForm.email()) ? 'email-error' : null"
+              class="field mt-1.5"
+            />
+            @if (shows(profileForm.email())) {
+              <p id="email-error" class="mt-1.5 text-xs text-negative">{{ copy().emailError }}</p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 border-t border-line pt-6" aria-labelledby="onboarding-preferences">
+        <h2 id="onboarding-preferences" class="type-section text-ink">
+          {{ copy().preferencesHeading }}
+        </h2>
+
+        <div class="mt-4">
+          <label class="block text-xs font-medium text-ink-muted" for="timeZone">
+            {{ copy().timeZoneLabel }}
+          </label>
+          <select
+            id="timeZone"
+            [formField]="profileForm.timeZone"
+            [attr.aria-invalid]="shows(profileForm.timeZone())"
+            class="field mt-1.5"
+          >
+            @for (zone of timeZones; track zone) {
+              <option [value]="zone">{{ zone }}</option>
+            }
+          </select>
+        </div>
+
+        <fieldset class="mt-5">
+          <legend class="text-xs font-medium text-ink-muted">{{ copy().periodLabel }}</legend>
+          <div class="mt-2 grid gap-2 sm:grid-cols-2">
+            @for (period of periods; track period) {
+              <label class="field flex cursor-pointer items-center gap-2.5">
+                <input
+                  type="radio"
+                  [formField]="profileForm.dashboardPeriod"
+                  [value]="period"
+                  class="h-4 w-4 accent-[var(--app-accent)]"
+                />
+                <span>{{ copy().periodLabels[period] }}</span>
+              </label>
+            }
+          </div>
+        </fieldset>
+      </section>
+
+      <div class="mt-8 border-t border-line pt-6">
+        <button type="submit" class="btn btn-primary w-full sm:w-auto">
+          {{ copy().continueLabel }}
+          <app-icon name="arrow-right" [size]="16" />
+        </button>
+      </div>
+    </form>
+  } @else {
+    <form
+      class="fade-in rounded-card border border-line bg-surface p-6 sm:p-8"
+      [formRoot]="importForm"
+    >
+      <section aria-labelledby="onboarding-import">
+        <h2 id="onboarding-import" class="type-section text-ink">{{ copy().importHeading }}</h2>
+
+        <div
+          class="mt-4 grid gap-3"
+          role="radiogroup"
+          [attr.aria-label]="copy().sourcesLabel"
+          [attr.aria-invalid]="shows(importForm.choice())"
+        >
+          @for (source of sources; track source.source) {
+            <app-import-source-option
+              [name]="source.name"
+              [description]="copy().sourceDescriptions[source.source]"
+              [tag]="sourceTag(source.available)"
+              [selected]="importForm.choice().value() === source.source"
+              [disabled]="!source.available"
+              (choose)="choose(source.source)"
+            />
+          }
+
+          <app-import-source-option
+            [name]="copy().laterName"
+            [description]="copy().laterDescription"
+            [selected]="importForm.choice().value() === 'later'"
+            (choose)="choose('later')"
+          />
+        </div>
+
+        @if (shows(importForm.choice())) {
+          <p class="mt-2 text-xs text-negative" role="alert">{{ copy().choiceRequiredError }}</p>
+        }
+
+        @if (importForm.choice().value() === 'budget-bakers') {
+          <div class="fade-in mt-4 rounded-control border border-line bg-bg p-4">
+            <label class="block text-xs font-medium text-ink-muted" for="token">
+              {{ copy().tokenLabel }}
+            </label>
+            <input
+              id="token"
+              type="password"
+              [formField]="importForm.token"
+              autocomplete="off"
+              spellcheck="false"
+              [placeholder]="copy().tokenPlaceholder"
+              [attr.aria-invalid]="tokenError() !== null"
+              [attr.aria-describedby]="tokenError() !== null ? 'token-error' : 'token-hint'"
+              class="mt-1.5 w-full rounded-control border border-line bg-surface px-3 py-2 font-mono text-sm text-ink placeholder:font-sans placeholder:text-ink-faint"
+            />
+            @if (tokenError() === 'required') {
+              <p id="token-error" class="mt-1.5 text-xs text-negative">
+                {{ copy().tokenRequiredError }}
+              </p>
+            } @else if (tokenError() === 'format') {
+              <p id="token-error" class="mt-1.5 text-xs text-negative">
+                {{ copy().tokenFormatError }}
+              </p>
+            } @else {
+              <p id="token-hint" class="mt-1.5 text-xs text-ink-faint">{{ copy().tokenHint }}</p>
+            }
+          </div>
+        }
+      </section>
+
+      <div
+        class="mt-8 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row-reverse sm:items-center sm:justify-end"
+      >
+        <button type="submit" [disabled]="saving()" class="btn btn-primary w-full sm:w-auto">
+          {{ saving() ? submittingLabel() : copy().submit }}
+        </button>
+        <button
+          type="button"
+          [disabled]="saving()"
+          (click)="goToProfile()"
+          class="btn btn-secondary w-full sm:w-auto"
+        >
+          <app-icon name="chevron-left" [size]="16" />
+          {{ copy().back }}
+        </button>
+      </div>
+
+      @if (failure() === 'conflict') {
+        <p class="mt-3 text-xs text-negative" role="alert">{{ copy().conflictError }}</p>
+      } @else if (failure() === 'invalid') {
+        <p class="mt-3 text-xs text-negative" role="alert">{{ copy().invalidError }}</p>
+      } @else if (failure() !== null) {
+        <p class="mt-3 text-xs text-negative" role="alert">{{ copy().submitError }}</p>
+      }
+    </form>
+  }
+</div>

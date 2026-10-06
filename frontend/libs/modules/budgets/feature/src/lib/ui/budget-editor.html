@@ -1,0 +1,239 @@
+@if (open()) {
+  <div class="fixed inset-0 z-40 flex justify-end">
+    <button
+      type="button"
+      class="absolute inset-0 bg-ink/25"
+      aria-label="Chiudi senza salvare"
+      (click)="closed.emit()"
+    ></button>
+
+    <aside
+      class="fade-in app-scroll relative flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-line bg-surface px-7 py-7"
+      role="dialog"
+      [attr.aria-label]="title()"
+    >
+      <header class="flex items-start justify-between gap-4">
+        <p class="type-section min-w-0 text-ink">{{ title() }}</p>
+        <button
+          type="button"
+          class="btn btn-icon -mt-1.5 -mr-2 shrink-0"
+          aria-label="Chiudi"
+          (click)="closed.emit()"
+        >
+          <app-icon name="close" [size]="16" />
+        </button>
+      </header>
+
+      <form [formRoot]="budgetForm" class="mt-6 flex flex-col gap-5">
+        <div>
+          <label class="block text-xs font-medium text-ink-muted" for="budget-name">Nome</label>
+          <input
+            id="budget-name"
+            type="text"
+            placeholder="Uscite fuori, Spesa, Auto…"
+            [formField]="budgetForm.name"
+            [attr.aria-invalid]="showError('name')"
+            class="field mt-1.5"
+          />
+          @if (showError('name')) {
+            <p class="mt-1 text-xs text-negative">
+              {{
+                budgetForm.name().getError('too-long')
+                  ? 'Al massimo 80 caratteri.'
+                  : 'Campo obbligatorio.'
+              }}
+            </p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-ink-muted" for="budget-limit">
+            Limite al mese
+          </label>
+          <div class="relative mt-1.5">
+            <input
+              id="budget-limit"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="300"
+              [formField]="budgetForm.limit"
+              [attr.aria-invalid]="showError('limit') || overRoom()"
+              [attr.aria-describedby]="
+                showError('limit') || overRoom() || room() !== null || budget()
+                  ? 'budget-limit-help'
+                  : null
+              "
+              class="field tnum pr-8"
+            />
+            <span
+              class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-ink-faint"
+              >€</span
+            >
+          </div>
+          @if (showError('limit')) {
+            <p id="budget-limit-help" class="mt-1 text-xs text-negative">Importo non valido.</p>
+          } @else if (overRoom()) {
+            <p id="budget-limit-help" class="mt-1 text-xs text-negative">
+              Supera il disponibile di «{{ parent()?.name }}» ({{ roomLabel() }}).
+            </p>
+          } @else if (room() !== null || budget()) {
+            <p id="budget-limit-help" class="mt-1 text-xs text-ink-faint">
+              @if (room() !== null) {
+                Disponibile: {{ roomLabel() }}.
+              }
+              @if (budget()) {
+                Valido da {{ monthLabel() }}.
+              }
+            </p>
+          }
+        </div>
+
+        <fieldset>
+          <legend class="text-xs font-medium text-ink-muted">
+            Categorie
+            <span class="font-normal text-ink-faint">
+              · {{ selectedCount() === 1 ? '1 scelta' : selectedCount() + ' scelte' }}
+            </span>
+          </legend>
+          @if (showError('categoryIds')) {
+            <p class="mt-1 text-xs text-negative">Scegli almeno una categoria.</p>
+          }
+
+          <div class="mt-2 flex flex-col">
+            @for (group of groups(); track group.label; let index = $index) {
+              <div>
+                <div class="flex items-center gap-2.5 pl-1">
+                  <!-- La casella del gruppo è fuori da ogni summary: un clic deve
+                       scegliere la macro, non aprire o chiudere l'elenco. -->
+                  <input
+                    type="checkbox"
+                    class="size-3.5 accent-[var(--color-accent)]"
+                    [id]="'budget-group-' + index"
+                    [checked]="isWholeGroup(group)"
+                    [indeterminate]="isPartialGroup(group)"
+                    [disabled]="group.available === 0"
+                    (change)="toggleGroup(group)"
+                  />
+                  <label
+                    class="min-w-0 flex-1 truncate text-sm font-medium"
+                    [class]="group.available === 0 ? 'text-ink-faint' : 'cursor-pointer text-ink'"
+                    [for]="'budget-group-' + index"
+                  >
+                    {{ group.label }}
+                  </label>
+                  <span class="tnum shrink-0 text-xs text-ink-faint">
+                    {{ group.selected }} di {{ group.options.length }}
+                  </span>
+                  <button
+                    type="button"
+                    class="btn btn-icon shrink-0"
+                    [attr.aria-expanded]="isExpanded(group.label)"
+                    [attr.aria-controls]="'budget-group-list-' + index"
+                    [attr.aria-label]="'Categorie di ' + group.label"
+                    (click)="toggleExpanded(group.label)"
+                  >
+                    <app-icon
+                      name="chevron-down"
+                      [size]="14"
+                      class="transition-transform"
+                      [class.rotate-180]="isExpanded(group.label)"
+                    />
+                  </button>
+                </div>
+                @if (isExpanded(group.label)) {
+                  <ul class="pb-2 pl-6" [id]="'budget-group-list-' + index">
+                    @for (option of group.options; track option.id) {
+                      <li>
+                        <label
+                          class="flex min-h-10 items-center gap-2.5 rounded-control px-1 text-sm sm:min-h-8"
+                          [class]="
+                            option.takenBy !== null
+                              ? 'cursor-default text-ink-faint'
+                              : 'cursor-pointer text-ink hover:bg-surface-2'
+                          "
+                        >
+                          <input
+                            type="checkbox"
+                            class="size-3.5 accent-[var(--color-accent)]"
+                            [checked]="isSelected(option.id)"
+                            [disabled]="option.takenBy !== null"
+                            (change)="toggle(option.id)"
+                          />
+                          <span class="min-w-0 flex-1 truncate">{{ option.name }}</span>
+                          @if (option.takenBy !== null) {
+                            <span class="shrink-0 text-xs">in «{{ option.takenBy }}»</span>
+                          }
+                        </label>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            } @empty {
+              <p class="py-2 text-sm text-ink-muted">Nessuna categoria disponibile.</p>
+            }
+          </div>
+        </fieldset>
+
+        @if (error(); as message) {
+          <p class="text-xs text-negative" role="alert">{{ message }}</p>
+        }
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="saving()"
+            (click)="attempted.set(true)"
+          >
+            {{ saving() ? 'Salvataggio…' : budget() ? 'Salva' : 'Crea budget' }}
+          </button>
+          <button type="button" class="btn btn-text text-sm" (click)="closed.emit()">
+            Annulla
+          </button>
+        </div>
+      </form>
+
+      @if (budget(); as current) {
+        <div class="mt-auto border-t border-line pt-6">
+          @if (confirmingDelete()) {
+            <p class="text-sm text-ink">
+              Eliminare «{{ current.name }}»
+              @if (childrenCount() > 0) {
+                e i suoi
+                {{ childrenCount() === 1 ? 'sotto-budget' : childrenCount() + ' sotto-budget' }}
+              }
+              ?
+            </p>
+            <div class="mt-3 flex gap-3">
+              <button
+                type="button"
+                class="btn btn-danger"
+                [disabled]="saving()"
+                (click)="removed.emit()"
+              >
+                Elimina
+              </button>
+              <button
+                type="button"
+                class="btn btn-text text-sm"
+                (click)="confirmingDelete.set(false)"
+              >
+                Annulla
+              </button>
+            </div>
+          } @else {
+            <button
+              type="button"
+              class="btn btn-text text-sm hover:text-negative"
+              (click)="confirmingDelete.set(true)"
+            >
+              Elimina budget
+            </button>
+          }
+        </div>
+      }
+    </aside>
+  </div>
+}

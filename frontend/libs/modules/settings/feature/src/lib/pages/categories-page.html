@@ -1,0 +1,135 @@
+<h2 class="type-section text-ink">Categorie</h2>
+
+@if (facade.failure() && !facade.editing()) {
+  <app-alert
+    class="mt-5"
+    [message]="facade.failure() ?? ''"
+    [dismissible]="true"
+    (dismissed)="facade.dismissFailure()"
+  />
+}
+
+@if (facade.categories.isLoading() && facade.tree().length === 0) {
+  <div class="mt-6 grid gap-8 sm:grid-cols-2">
+    <app-skeleton [height]="160" />
+    <app-skeleton [height]="160" />
+  </div>
+} @else {
+  <div class="mt-6 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+    @for (branch of facade.tree(); track branch.macro.id) {
+      <section [attr.aria-label]="branch.macro.name">
+        <button
+          type="button"
+          class="-mx-2 flex min-h-10 w-[calc(100%+1rem)] cursor-pointer items-center justify-between gap-3 rounded-control px-2 text-left text-sm font-medium text-ink transition-colors hover:bg-surface-2 sm:min-h-9"
+          (click)="facade.open(branch.macro)"
+        >
+          <span class="min-w-0 truncate">{{ branch.macro.name }}</span>
+          <span class="tnum shrink-0 text-xs font-normal text-ink-faint">
+            {{ branch.children.length }}
+          </span>
+        </button>
+
+        <ul class="mt-1 border-l border-line pl-3">
+          @for (child of branch.children; track child.id) {
+            <li>
+              <button
+                type="button"
+                class="-mx-2 flex min-h-10 w-[calc(100%+1rem)] cursor-pointer items-center rounded-control px-2 text-left text-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink sm:min-h-8"
+                (click)="facade.open(child)"
+              >
+                <span class="min-w-0 truncate">{{ child.name }}</span>
+              </button>
+            </li>
+          }
+          <li>
+            <button type="button" class="btn btn-text" (click)="facade.openNew(branch.macro)">
+              <app-icon name="plus" [size]="12" />
+              Sottocategoria
+            </button>
+          </li>
+        </ul>
+      </section>
+    }
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-secondary mt-8 w-full sm:w-auto"
+    (click)="facade.openNew(null)"
+  >
+    <app-icon name="plus" [size]="14" />
+    Nuova macro
+  </button>
+}
+
+<section class="mt-12" aria-labelledby="categories-sources-heading">
+  <h2 id="categories-sources-heading" class="type-section text-ink">Da BudgetBakers</h2>
+  <p class="mt-2 max-w-xl text-sm text-ink-muted">
+    Le modifiche si applicano anche ai movimenti già importati.
+  </p>
+
+  @if (facade.sources.value().length === 0 && !facade.sources.isLoading()) {
+    <app-empty-state title="Nessuna categoria importata" />
+  } @else {
+    <div class="mt-4 flex flex-col">
+      @for (group of sourceGroups(); track group.label) {
+        <details class="group">
+          <summary
+            class="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 text-sm text-ink sm:min-h-9"
+          >
+            <span>{{ group.label }}</span>
+            <span class="flex items-center gap-2 text-xs text-ink-faint">
+              {{ group.sources.length }}
+              <app-icon
+                name="chevron-down"
+                [size]="14"
+                class="transition-transform group-open:rotate-180"
+              />
+            </span>
+          </summary>
+          <ul class="flex flex-col gap-3 pt-1 pb-4 pl-3">
+            @for (source of group.sources; track source.id) {
+              <!-- Su telefono nome sopra e scelta sotto, a tutta riga. -->
+              <li class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+                <span class="min-w-0 flex-1 truncate text-sm text-ink-muted">{{
+                  source.name
+                }}</span>
+                <select
+                  class="field sm:w-64"
+                  [attr.aria-label]="'Dove finisce ' + source.name"
+                  [disabled]="facade.busy()"
+                  (change)="relink(source.id, $any($event.target).value)"
+                >
+                  @if (source.categoryId === null) {
+                    <option value="" selected>Non agganciata</option>
+                  }
+                  @for (branch of facade.tree(); track branch.macro.id) {
+                    <optgroup [label]="branch.macro.name">
+                      @for (target of branch.children; track target.id) {
+                        <option [value]="target.id" [selected]="target.id === source.categoryId">
+                          {{ target.name }}
+                        </option>
+                      }
+                    </optgroup>
+                  }
+                </select>
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    </div>
+  }
+</section>
+
+<app-category-editor
+  [open]="facade.editing() !== null"
+  [category]="facade.editing()?.category ?? null"
+  [parent]="facade.editing()?.parent ?? null"
+  [tree]="facade.tree()"
+  [busy]="facade.busy()"
+  [failure]="facade.failure()"
+  (closed)="facade.close()"
+  (saved)="onSaved($event)"
+  (removed)="onRemoved($event)"
+/>

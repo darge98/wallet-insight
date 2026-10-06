@@ -1,0 +1,169 @@
+<header class="max-w-xl">
+  <h1 class="type-display text-ink">Abbonamenti</h1>
+</header>
+
+<!-- La riga dei comandi è quella dei Budget: la vista a sinistra, col mese
+     accanto quando serve, e il comando per aggiungere in fondo a destra. -->
+<div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+  @if (hasSubscriptions()) {
+    <app-segmented-control
+      label="Vista"
+      [options]="viewOptions"
+      [value]="facade.view()"
+      (valueChange)="facade.setView($event)"
+    />
+  }
+  @if (hasSubscriptions() && facade.view() === 'calendar') {
+    <nav class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3" aria-label="Mese">
+      <div
+        class="flex w-full items-center gap-1 rounded-control border border-line p-0.5 sm:w-auto"
+      >
+        <button
+          type="button"
+          class="btn btn-icon"
+          aria-label="Mese precedente"
+          (click)="facade.previousMonth()"
+        >
+          <app-icon name="chevron-left" [size]="16" />
+        </button>
+        <p
+          class="min-w-36 flex-1 text-center text-sm font-medium text-ink first-letter:uppercase"
+          aria-live="polite"
+        >
+          {{ monthLabel() }}
+        </p>
+        <button
+          type="button"
+          class="btn btn-icon"
+          aria-label="Mese successivo"
+          (click)="facade.nextMonth()"
+        >
+          <app-icon name="chevron-right" [size]="16" />
+        </button>
+      </div>
+      @if (!facade.isCurrentMonth()) {
+        <button type="button" class="btn btn-text self-center" (click)="facade.goToCurrentMonth()">
+          Torna a questo mese
+        </button>
+      }
+    </nav>
+  }
+  <button
+    type="button"
+    class="btn btn-secondary w-full sm:ml-auto sm:w-auto"
+    (click)="facade.create()"
+  >
+    <app-icon name="plus" [size]="15" />
+    Nuovo abbonamento
+  </button>
+</div>
+
+@if (facade.hasError()) {
+  <app-alert class="mt-6" message="Non è stato possibile caricare gli abbonamenti.">
+    <button type="button" class="btn btn-text text-negative" (click)="facade.refresh()">
+      Riprova
+    </button>
+  </app-alert>
+}
+
+@if (hasSubscriptions()) {
+  <!-- Su telefono il riepilogo non c'è: lì contano gli addebiti. Da «lg» in su
+       sta nella colonna di destra. -->
+  <div class="mt-8 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <aside class="hidden sm:block lg:order-last" aria-label="Costo degli abbonamenti">
+      <app-subscriptions-summary [overview]="facade.overview.value()" />
+    </aside>
+
+    @if (facade.view() === 'calendar') {
+      <section aria-label="Calendario dei rinnovi">
+        <app-renewal-calendar
+          [month]="facade.month()"
+          [monthLabel]="monthLabel()"
+          [charges]="facade.calendar.value()"
+          [loading]="facade.calendar.isLoading()"
+          [today]="facade.today()"
+          (edit)="facade.edit($event)"
+        />
+      </section>
+    } @else {
+      <div class="flex flex-col gap-10">
+        <app-upcoming-charges
+          [overview]="facade.overview.value()"
+          [horizon]="facade.horizon()"
+          (horizonChange)="facade.setHorizon($event)"
+          (edit)="facade.edit($event)"
+        />
+
+        @if (facade.activeGroups().length > 0) {
+          <section aria-labelledby="subscriptions-active">
+            <h2 id="subscriptions-active" class="type-section text-ink">Attivi</h2>
+            <div class="mt-3 flex flex-col gap-7">
+              @for (group of facade.activeGroups(); track group.key) {
+                <section>
+                  <h3 class="type-eyebrow text-ink-faint">{{ group.label }}</h3>
+                  <ul class="mt-2 flex flex-col gap-0.5">
+                    @for (subscription of group.subscriptions; track subscription.id) {
+                      <li>
+                        <button
+                          type="button"
+                          class="-mx-3 w-[calc(100%+1.5rem)] cursor-pointer rounded-control px-3 text-left transition-colors hover:bg-surface-2"
+                          (click)="facade.edit(subscription.id)"
+                        >
+                          <app-subscription-row
+                            [subscription]="subscription"
+                            [today]="facade.today()"
+                            [accountName]="account(subscription)?.name ?? null"
+                            [accountColor]="account(subscription)?.color ?? null"
+                          />
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                </section>
+              }
+            </div>
+          </section>
+        }
+
+        @if (facade.ended().length > 0) {
+          <section aria-labelledby="subscriptions-ended">
+            <h2 id="subscriptions-ended" class="type-section text-ink-muted">Conclusi</h2>
+            <ul class="mt-3 flex flex-col gap-0.5">
+              @for (subscription of facade.ended(); track subscription.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="-mx-3 w-[calc(100%+1.5rem)] cursor-pointer rounded-control px-3 text-left transition-colors hover:bg-surface-2"
+                    (click)="facade.edit(subscription.id)"
+                  >
+                    <app-subscription-row
+                      [subscription]="subscription"
+                      [today]="facade.today()"
+                      [accountName]="account(subscription)?.name ?? null"
+                      [accountColor]="account(subscription)?.color ?? null"
+                    />
+                  </button>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+    }
+  </div>
+} @else if (!facade.subscriptions.isLoading() && !facade.hasError()) {
+  <app-empty-state class="mt-8" title="Nessun abbonamento" />
+}
+
+<app-subscription-editor
+  [open]="facade.editing() !== null"
+  [subscription]="facade.editing()?.subscription ?? null"
+  [today]="facade.today()"
+  [categories]="facade.categories.value()"
+  [accounts]="editorAccounts()"
+  [saving]="facade.saving()"
+  [error]="facade.saveError()"
+  (closed)="facade.closeEditor()"
+  (saved)="onSave($event)"
+  (removed)="onRemove()"
+/>

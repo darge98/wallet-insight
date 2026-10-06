@@ -1,0 +1,102 @@
+<header class="max-w-xl">
+  <h1 class="type-display text-ink">Budget</h1>
+</header>
+
+<!-- Su telefono il selettore prende tutta la riga, con frecce da 40 px: è il
+     comando che si usa di più, e va preso col pollice. -->
+<div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+  <nav class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3" aria-label="Mese">
+    <div class="flex w-full items-center gap-1 rounded-control border border-line p-0.5 sm:w-auto">
+      <button
+        type="button"
+        class="btn btn-icon"
+        aria-label="Mese precedente"
+        (click)="facade.previousMonth()"
+      >
+        <app-icon name="chevron-left" [size]="16" />
+      </button>
+      <p
+        class="min-w-36 flex-1 text-center text-sm font-medium text-ink first-letter:uppercase"
+        aria-live="polite"
+      >
+        {{ monthLabel() }}
+      </p>
+      <button
+        type="button"
+        class="btn btn-icon disabled:opacity-30"
+        aria-label="Mese successivo"
+        [disabled]="facade.isCurrentMonth()"
+        (click)="facade.nextMonth()"
+      >
+        <app-icon name="chevron-right" [size]="16" />
+      </button>
+    </div>
+    @if (!facade.isCurrentMonth()) {
+      <button type="button" class="btn btn-text self-center" (click)="facade.goToCurrentMonth()">
+        Torna a questo mese
+      </button>
+    }
+  </nav>
+  <!-- Secondario e non pieno: il verde della pagina è delle barre, non del comando. -->
+  <button
+    type="button"
+    class="btn btn-secondary w-full sm:ml-auto sm:w-auto"
+    (click)="facade.create()"
+  >
+    <app-icon name="plus" [size]="15" />
+    Nuovo budget
+  </button>
+</div>
+
+@if (facade.hasError()) {
+  <app-alert class="mt-6" message="Non è stato possibile caricare i budget.">
+    <button type="button" class="btn btn-text text-negative" (click)="facade.refresh()">
+      Riprova
+    </button>
+  </app-alert>
+}
+
+<!-- Su telefono il riepilogo non c'è: lì contano i budget uno per uno. Da «lg» in
+     su sta nella colonna di destra. -->
+<div class="mt-8 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
+  <aside class="hidden sm:block lg:order-last" aria-label="Riepilogo del mese">
+    <app-budget-month-panel [report]="facade.report.value()" [daysLeft]="daysLeft()" />
+  </aside>
+
+  <section aria-label="Budget del mese">
+    @if (facade.report.value(); as month) {
+      @if (month.budgets.length > 0) {
+        <ul class="flex flex-col gap-9">
+          @for (status of month.budgets; track status.id) {
+            <li>
+              <app-budget-card
+                [status]="status"
+                [editable]="isEditable(status.id)"
+                (edit)="facade.edit($event)"
+                (addChild)="facade.create($event)"
+              />
+            </li>
+          }
+        </ul>
+      } @else if (hasBudgets()) {
+        <app-empty-state [title]="'Nessun budget in vigore a ' + monthLabel()" />
+      } @else if (!facade.budgets.isLoading()) {
+        <app-empty-state title="Nessun budget" />
+      }
+    }
+  </section>
+</div>
+
+<app-budget-editor
+  [open]="facade.editing() !== null"
+  [budget]="facade.editing()?.budget ?? null"
+  [parent]="facade.editing()?.parent ?? null"
+  [budgets]="facade.budgets.value()"
+  [categories]="facade.categories.value()"
+  [currentMonth]="facade.currentMonth()"
+  [saving]="facade.saving()"
+  [error]="facade.saveError()"
+  (closed)="facade.closeEditor()"
+  (saved)="onSave($event)"
+  (removed)="onRemove()"
+/>
