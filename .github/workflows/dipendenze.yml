@@ -47,7 +47,8 @@ jobs:
           path: ~/.gradle/dependency-check-data
           key: nvd-${{ github.run_id }}
           restore-keys: nvd-
-      - run: ./gradlew dependencyCheckAnalyze --no-daemon
+      # Importare il database NVD non sta nei 512 MB che Gradle si dà di suo.
+      - run: ./gradlew dependencyCheckAnalyze --no-daemon -Dorg.gradle.jvmargs=-Xmx4g
       - uses: actions/upload-artifact@v7
         if: always()
         with:
