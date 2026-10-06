@@ -111,18 +111,13 @@
             <label class="block text-xs font-medium text-ink-muted" for="movement-category">
               Categoria
             </label>
-            <select id="movement-category" [formField]="editForm.category" class="field mt-1.5">
-              @if (withoutCategory()) {
-                <option [value]="noCategory">Senza categoria</option>
-              }
-              @for (group of categoryGroups(); track group.label) {
-                <optgroup [label]="group.label">
-                  @for (option of group.categories; track option.id) {
-                    <option [value]="option.id">{{ option.name }}</option>
-                  }
-                </optgroup>
-              }
-            </select>
+            <app-category-picker
+              inputId="movement-category"
+              class="mt-1.5"
+              [formField]="editForm.category"
+              [categories]="categories()"
+              [emptyLabel]="withoutCategory() ? 'Senza categoria' : null"
+            />
           </div>
 
           @if (saveFailed()) {

@@ -49,7 +49,8 @@
       "@wallet/upcoming-feature": ["./libs/modules/upcoming/feature/src/index.ts"],
       "@wallet/onboarding-feature": ["./libs/modules/onboarding/feature/src/index.ts"],
       "@wallet/settings-feature": ["./libs/modules/settings/feature/src/index.ts"],
-      "@wallet/shared-ui/echarts": ["./libs/shared/ui/src/echarts.ts"]
+      "@wallet/shared-ui/echarts": ["./libs/shared/ui/src/echarts.ts"],
+      "@wallet/shared-ui/category-picker": ["./libs/shared/ui/src/category-picker.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

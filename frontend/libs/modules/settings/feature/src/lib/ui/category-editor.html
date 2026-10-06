@@ -109,22 +109,13 @@
             <p class="mt-1 text-xs leading-relaxed text-ink-faint">
               Movimenti e collegamenti passano alla categoria scelta.
             </p>
-            <select
-              id="category-merge"
-              class="field mt-2"
-              (change)="mergeInto.set($any($event.target).value)"
-            >
-              <option value="" [selected]="mergeInto() === ''">Scegli…</option>
-              @for (branch of tree(); track branch.macro.id) {
-                <optgroup [label]="branch.macro.name">
-                  @for (target of branch.children; track target.id) {
-                    @if (target.id !== current.id) {
-                      <option [value]="target.id">{{ target.name }}</option>
-                    }
-                  }
-                </optgroup>
-              }
-            </select>
+            <app-category-picker
+              inputId="category-merge"
+              class="mt-2"
+              [categories]="categories()"
+              [exclude]="current.id"
+              [(value)]="mergeInto"
+            />
             <button
               type="button"
               class="btn btn-danger mt-3"

@@ -94,25 +94,15 @@
                 <span class="min-w-0 flex-1 truncate text-sm text-ink-muted">{{
                   source.name
                 }}</span>
-                <select
-                  class="field sm:w-64"
-                  [attr.aria-label]="'Dove finisce ' + source.name"
+                <app-category-picker
+                  class="sm:w-64"
+                  placeholder="Non agganciata"
+                  [label]="'Dove finisce ' + source.name"
                   [disabled]="facade.busy()"
-                  (change)="relink(source.id, $any($event.target).value)"
-                >
-                  @if (source.categoryId === null) {
-                    <option value="" selected>Non agganciata</option>
-                  }
-                  @for (branch of facade.tree(); track branch.macro.id) {
-                    <optgroup [label]="branch.macro.name">
-                      @for (target of branch.children; track target.id) {
-                        <option [value]="target.id" [selected]="target.id === source.categoryId">
-                          {{ target.name }}
-                        </option>
-                      }
-                    </optgroup>
-                  }
-                </select>
+                  [categories]="facade.categories.value()"
+                  [value]="source.categoryId ?? ''"
+                  (valueChange)="relink(source.id, $event)"
+                />
               </li>
             }
           </ul>

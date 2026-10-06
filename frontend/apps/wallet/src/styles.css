@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* Posizione dei pannelli che si aprono sopra la pagina (CDK overlay). */
+@import '@angular/cdk/overlay-prebuilt.css';
 @import '../../../libs/shared/ui/src/styles/design-system.css';
 
 /*

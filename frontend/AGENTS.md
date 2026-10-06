@@ -227,6 +227,9 @@ presentazione), `pages/` (la pagina che orchestra), `<nome>.routes.ts`.
   e da `file://`, ed è ciò che rende possibile la build a file singolo.
 - ECharts vive nell'entry point secondario `@wallet/shared-ui/echarts`, caricato on demand
   da `provideEchartsCore`: non importarlo dal barrel principale, finirebbe nel bundle iniziale.
+- La scelta di una categoria è `app-category-picker`, in `@wallet/shared-ui/category-picker`:
+  una combobox con ricerca costruita su `@angular/aria`. Anche lei fuori dal barrel, perché
+  si porta dietro aria e l'overlay del CDK.
 - Budget di bundle in `apps/wallet/project.json`: 600 kB di warning, 1.5 MB di errore
   sull'initial.
 

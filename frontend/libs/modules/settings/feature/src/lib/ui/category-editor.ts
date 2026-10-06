@@ -10,6 +10,7 @@ import {
 
 import { Category, CategoryBranch, CategoryId } from '@wallet/shared-domain';
 import { Alert, Icon } from '@wallet/shared-ui';
+import { CategoryPicker } from '@wallet/shared-ui/category-picker';
 
 /**
  * Il pannello di una categoria: nome e macro, e in fondo come toglierla.
@@ -20,7 +21,7 @@ import { Alert, Icon } from '@wallet/shared-ui';
 @Component({
   selector: 'app-category-editor',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Alert, Icon],
+  imports: [Alert, CategoryPicker, Icon],
   host: { class: 'contents' },
   templateUrl: './category-editor.html',
 })
@@ -41,6 +42,10 @@ export class CategoryEditor {
   protected readonly name = signal('');
   protected readonly parentId = signal<string>('');
   protected readonly mergeInto = signal<string>('');
+
+  protected readonly categories = computed(() =>
+    this.tree().flatMap((branch) => [branch.macro, ...branch.children]),
+  );
   protected readonly confirming = signal(false);
 
   constructor() {
