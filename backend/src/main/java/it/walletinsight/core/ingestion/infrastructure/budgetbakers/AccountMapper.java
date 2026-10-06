@@ -124,7 +124,7 @@ class AccountMapper {
             return 0L;
         }
         int scale = value.stripTrailingZeros().scale();
-        if (scale > MINOR_UNIT_DIGITS) {
+        if (scale > MINOR_UNIT_DIGITS && log.isErrorEnabled()) {
             log.error("Conto {} ('{}'): {} vale {} con {} decimali, piu' dei {} rappresentabili "
                             + "in centesimi. Arrotondato, ma il valore originale e' andato perso.",
                     dto.id(), dto.name(), campo, value.toPlainString(), scale, MINOR_UNIT_DIGITS);

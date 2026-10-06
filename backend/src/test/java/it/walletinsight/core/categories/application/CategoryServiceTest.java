@@ -60,7 +60,7 @@ class CategoryServiceTest extends AbstractDatabaseTest {
                 new ImportedCategory("cat-boh", "Boh", null, null, null)));
 
         assertThat(nome(agganci.get("cat-spesa"))).isEqualTo("Spesa");
-        assertThat(agganci.get("cat-mercato")).isEqualTo(agganci.get("cat-spesa"));
+        assertThat(agganci).containsEntry("cat-mercato", agganci.get("cat-spesa"));
         assertThat(nome(agganci.get("cat-boh"))).isEqualTo("Da classificare");
     }
 
@@ -75,7 +75,7 @@ class CategoryServiceTest extends AbstractDatabaseTest {
         Map<String, CategoryId> dopo = service.syncFromSource(marta, IngestionSource.BUDGET_BAKERS, List.of(
                 new ImportedCategory("cat-1", "Cibo e bevande", "food_and_drinks", null, "cibo/ristoranti")));
 
-        assertThat(dopo.get("cat-1")).isEqualTo(spesa);
+        assertThat(dopo).containsEntry("cat-1", spesa);
         assertThat(service.listSourceCategories(marta).getFirst().name()).isEqualTo("Cibo e bevande");
     }
 

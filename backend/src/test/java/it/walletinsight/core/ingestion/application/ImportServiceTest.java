@@ -28,10 +28,6 @@ import it.walletinsight.shared.page.PageRequest;
 import it.walletinsight.shared.source.IngestionSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.Order;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.ZoneOffset;
@@ -98,8 +94,7 @@ class ImportServiceTest extends it.walletinsight.support.AbstractDatabaseTest {
         given(sorgente.source()).willReturn(IngestionSource.BUDGET_BAKERS);
         given(sorgente.readAccounts(any())).willAnswer(i -> List.of(conto(
                 ((ImportConnection) i.getArgument(0)).userId(), "acc-1", "Credem")));
-        given(sorgente.readCategories(any())).willAnswer(i -> List.of(categoria(
-                ((ImportConnection) i.getArgument(0)).userId(), "cat-1", "Ristoranti")));
+        given(sorgente.readCategories(any())).willAnswer(i -> List.of(categoria("cat-1", "Ristoranti")));
         // I movimenti si costruiscono dai conti e dalle categorie *appena allineati*:
         // e' esattamente quello che fa un adapter vero, e verifica che l'ordine sia
         // rispettato — se arrivassero dopo, qui non ci sarebbe nessun identificatore.
@@ -143,8 +138,7 @@ class ImportServiceTest extends it.walletinsight.support.AbstractDatabaseTest {
         given(sorgente.source()).willReturn(IngestionSource.BUDGET_BAKERS);
         given(sorgente.readAccounts(any())).willAnswer(i -> List.of(conto(
                 ((ImportConnection) i.getArgument(0)).userId(), "acc-1", "Credem")));
-        given(sorgente.readCategories(any())).willAnswer(i -> List.of(categoria(
-                ((ImportConnection) i.getArgument(0)).userId(), "cat-1", "Ristoranti")));
+        given(sorgente.readCategories(any())).willAnswer(i -> List.of(categoria("cat-1", "Ristoranti")));
         given(sorgente.readMovements(any(), any(), any())).willAnswer(i -> new ImportedMovements(
                 LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 23),
                 List.of(movimento(primoConto(i.getArgument(1)), primaCategoria(i.getArgument(2)),
@@ -358,8 +352,7 @@ class ImportServiceTest extends it.walletinsight.support.AbstractDatabaseTest {
         given(sorgente.source()).willReturn(IngestionSource.BUDGET_BAKERS);
         given(sorgente.readAccounts(any())).willAnswer(i -> List.of(conto(
                 ((ImportConnection) i.getArgument(0)).userId(), "acc-1", "Credem")));
-        given(sorgente.readCategories(any())).willAnswer(i -> List.of(categoria(
-                ((ImportConnection) i.getArgument(0)).userId(), "cat-1", "Ristoranti")));
+        given(sorgente.readCategories(any())).willAnswer(i -> List.of(categoria("cat-1", "Ristoranti")));
         given(sorgente.readMovements(any(), any(), any())).willAnswer(i -> new ImportedMovements(
                 giorno, LocalDate.now().plusDays(1),
                 List.of(inSospeso(primoConto(i.getArgument(1)), primaCategoria(i.getArgument(2)),
@@ -398,7 +391,7 @@ class ImportServiceTest extends it.walletinsight.support.AbstractDatabaseTest {
         return ((List<Account>) allineati).getFirst();
     }
 
-    private static ImportedCategory categoria(UserId userId, String externalId, String nome) {
+    private static ImportedCategory categoria(String externalId, String nome) {
         return new ImportedCategory(externalId, nome, "food_and_drinks", null, "cibo/ristoranti");
     }
 

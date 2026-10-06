@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,12 +117,9 @@ public class ImportService {
             throw new ResourceNotFoundException(USER_RESOURCE_TYPE, userId.toString());
         }
 
-        List<ImportConnection> attive = connections.findEnabledByUser(userId);
-        List<ImportOutcome> esiti = new ArrayList<>(attive.size());
-        for (ImportConnection connection : attive) {
-            esiti.add(importOne(connection));
-        }
-        return esiti;
+        return connections.findEnabledByUser(userId).stream()
+                .map(this::importOne)
+                .toList();
     }
 
     /** Importa una sola sorgente dell'utente, se è collegata e attiva. */

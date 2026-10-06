@@ -15,15 +15,14 @@ public record UserSettings(UserLanguage language, String timeZone, DashboardPeri
     public UserSettings {
         Objects.requireNonNull(language, "language");
         Objects.requireNonNull(defaultDashboardPeriod, "defaultDashboardPeriod");
-        timeZone = requireSupportedZone(timeZone);
+        requireSupportedZone(timeZone);
     }
 
-    private static String requireSupportedZone(String timeZone) {
+    private static void requireSupportedZone(String timeZone) {
         Objects.requireNonNull(timeZone, "timeZone");
         if (!ZoneId.getAvailableZoneIds().contains(timeZone)) {
             // Il messaggio finisce nel ProblemDetail 400: contiene solo un valore inviato dal client.
             throw new IllegalArgumentException("Fuso orario non valido: %s.".formatted(timeZone));
         }
-        return timeZone;
     }
 }

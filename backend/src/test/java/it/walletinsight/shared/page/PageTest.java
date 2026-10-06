@@ -35,7 +35,7 @@ class PageTest {
 
     @Test
     void calcolaLoScostamentoPerLaQuery() {
-        assertThat(PageRequest.of(0, 25).offset()).isEqualTo(0L);
+        assertThat(PageRequest.of(0, 25).offset()).isZero();
         assertThat(PageRequest.of(3, 25).offset()).isEqualTo(75L);
     }
 

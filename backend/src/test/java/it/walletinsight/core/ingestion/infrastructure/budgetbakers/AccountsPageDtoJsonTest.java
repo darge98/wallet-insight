@@ -182,7 +182,7 @@ class AccountsPageDtoJsonTest {
     }
 
     @Test
-    void unTipoFuoriSpecificaNonFaScartareIlConto() throws Exception {
+    void unTipoFuoriSpecificaNonFaScartareIlConto() {
         // Perdere il conto significherebbe perdere piu' avanti anche i suoi movimenti.
         AccountDto strano = new AccountDto("acc-x", "Salvadanaio", "Piggybank", "EUR",
                 false, null, false, false, null, null, null, null);

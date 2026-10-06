@@ -13,7 +13,7 @@ import java.util.UUID;
  */
 public record UpdateCategoryRequest(
         @Size(max = Category.MAX_NAME_LENGTH)
-        @Pattern(regexp = ".*\\S.*", message = "non può essere vuoto")
+        @Pattern(regexp = "\\s*\\S.*", message = "non può essere vuoto")
         @Schema(example = "Ristoranti") String name,
 
         @Pattern(regexp = "^$|^#[0-9a-fA-F]{6}$", message = "deve essere nel formato #rrggbb o la stringa vuota")

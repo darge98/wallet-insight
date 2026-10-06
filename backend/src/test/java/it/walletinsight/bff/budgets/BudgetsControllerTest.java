@@ -50,8 +50,8 @@ class BudgetsControllerTest {
     @MockitoBean
     private CategoryService categories;
 
-    private final Category ristoranti = categoria("cat-1", "Ristoranti");
-    private final Category spesa = categoria("cat-2", "Spesa");
+    private final Category ristoranti = categoria("Ristoranti");
+    private final Category spesa = categoria("Spesa");
     private Budget cibo;
     private Budget fuori;
 
@@ -167,7 +167,7 @@ class BudgetsControllerTest {
         then(budgets).should().deleteBudget(UTENTE, cibo.id());
     }
 
-    private static Category categoria(String externalId, String nome) {
+    private static Category categoria(String nome) {
         return Category.create(UTENTE, CategoryId.newId(), nome);
     }
 }

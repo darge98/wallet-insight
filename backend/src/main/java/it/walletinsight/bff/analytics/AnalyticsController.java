@@ -138,12 +138,12 @@ class AnalyticsController {
             }
             ConvertedMovements movimenti = spostato.getOrDefault(conto.id(), ConvertedMovements.NONE);
             Optional<Money> iniziale = movimenti.convert(conto.initialBalance());
-            if (iniziale.isEmpty()) {
+            if (iniziale.isPresent()) {
+                totale = totale.plus(iniziale.get()).plus(movimenti.total());
+            } else {
                 log.warn("Conto {} in {} senza movimenti da cui ricavare il cambio: fuori dal patrimonio",
                         conto.id(), conto.initialBalance().currency());
-                continue;
             }
-            totale = totale.plus(iniziale.get()).plus(movimenti.total());
         }
         return totale;
     }
@@ -232,7 +232,7 @@ class AnalyticsController {
      * una richiesta malscritta, non qualcosa da mostrare all'utente.
      */
     private static int limitOf(int requested) {
-        return Math.max(1, Math.min(requested, MAX_LIMIT));
+        return Math.clamp(requested, 1, MAX_LIMIT);
     }
 
     /** Senza uscite nel periodo la quota è zero, non una divisione per zero. */

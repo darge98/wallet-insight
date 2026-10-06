@@ -22,7 +22,7 @@ public record UpdateAccountRequest(
         // qui è legittima. Su un valore nullo `@Pattern` non si pronuncia, su uno di
         // soli spazi sì — che è esattamente la distinzione che serve a un PATCH.
         @Size(max = Account.MAX_NAME_LENGTH)
-        @jakarta.validation.constraints.Pattern(regexp = ".*\\S.*", message = "non può essere vuoto")
+        @jakarta.validation.constraints.Pattern(regexp = "\\s*\\S.*", message = "non può essere vuoto")
         @Schema(example = "Conto stipendio") String name,
 
         @Pattern(regexp = "^#[0-9a-fA-F]{6}$", message = "deve essere nel formato #rrggbb")

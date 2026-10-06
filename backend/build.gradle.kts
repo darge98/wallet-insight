@@ -79,5 +79,28 @@ sonar {
 		property("sonar.organization", "darge98")
 		property("sonar.projectKey", "darge98_wallet-insight-backend")
 		property("sonar.projectName", "Wallet Insights — backend")
+
+		// Eccezioni dichiarate, ognuna col suo perché.
+		val eccezioni = mapOf(
+			// I frammenti dentro `formatted` sono costanti, uno switch su un enum e
+			// condizioni fisse: i valori dell'utente passano sempre come parametri.
+			"sqlComposto" to ("java:S2077" to "**/movements/infrastructure/jdbc/JdbcMovementRepository.java"),
+			// Nomi di parametri e di colonne SQL: una costante per `"userId"` renderebbe
+			// la query meno leggibile senza toglierne la ripetizione.
+			"parametriSql" to ("java:S1192" to "**/infrastructure/jdbc/**"),
+			// La tabella delle categorie di BudgetBakers: il codice ripetuto è il dato.
+			"tabellaCategorie" to ("java:S1192" to "**/budgetbakers/BudgetBakersCategories.java"),
+			// Nei test l'argomento di assertThatThrownBy si costruisce dentro la lambda:
+			// spezzarlo allungherebbe ogni test senza renderlo più preciso.
+			"lambdaNeiTest" to ("java:S5778" to "src/test/**"),
+			// now() di PostgreSQL è l'ora della transazione: senza attesa created_at e
+			// updated_at coinciderebbero anche quando l'update funziona.
+			"attesaNeiTest" to ("java:S2925" to "src/test/**"),
+		)
+		property("sonar.issue.ignore.multicriteria", eccezioni.keys.joinToString(","))
+		eccezioni.forEach { (nome, regola) ->
+			property("sonar.issue.ignore.multicriteria.$nome.ruleKey", regola.first)
+			property("sonar.issue.ignore.multicriteria.$nome.resourceKey", regola.second)
+		}
 	}
 }
