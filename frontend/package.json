@@ -24,7 +24,7 @@
     "@analogjs/vitest-angular": "~2.6.0",
     "@angular-devkit/core": "~22.1.0",
     "@angular-devkit/schematics": "~22.1.0",
-    "@angular/build": "~22.1.0",
+    "@angular/build": "~22.2.1",
     "@angular/cli": "~22.1.0",
     "@angular/compiler-cli": "~22.1.0",
     "@angular/language-service": "~22.1.0",
