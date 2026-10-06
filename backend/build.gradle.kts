@@ -2,6 +2,8 @@ plugins {
 	java
 	id("org.springframework.boot") version "4.1.1"
 	id("io.spring.dependency-management") version "1.1.7"
+	jacoco
+	id("org.sonarqube") version "7.5.0.8588"
 }
 
 group = "it.walletinsight"
@@ -57,4 +59,25 @@ dependencyManagement {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+jacoco {
+	// Java 25 lo legge solo da JaCoCo 0.8.14 in su.
+	toolVersion = "0.8.15"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required = true
+	}
+}
+
+sonar {
+	properties {
+		property("sonar.host.url", "https://sonarcloud.io")
+		property("sonar.organization", "darge98")
+		property("sonar.projectKey", "darge98_wallet-insight-backend")
+		property("sonar.projectName", "Wallet Insights — backend")
+	}
 }

@@ -18,8 +18,13 @@ jobs:
     defaults:
       run:
         working-directory: frontend
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONTEND }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Sonar legge la storia per attribuire i problemi al codice nuovo.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version-file: frontend/.nvmrc
@@ -29,5 +34,18 @@ jobs:
       # Lo stesso `npm run verify` dello sviluppo (lint, test, build), spezzato
       # in passi per vedere subito quale ha fallito.
       - run: npm run lint
-      - run: npm test
+      - run: npx nx run-many -t test --coverage
       - run: npm run build
+      # Ogni libreria scrive l'lcov coi percorsi relativi a sé: Sonar li vuole
+      # relativi a frontend/, e la cartella del report è quella della libreria.
+      - name: Percorsi della coverage
+        run: |
+          find coverage -name lcov.info | while read -r f; do
+            dir=${f#coverage/}; dir=${dir%/lcov.info}
+            sed -i "s|^SF:|SF:$dir/|" "$f"
+          done
+      # Le PR da fork e di Dependabot non vedono i secret: lì l'analisi si salta.
+      - uses: SonarSource/sonarqube-scan-action@v8
+        if: env.SONAR_TOKEN != ''
+        with:
+          projectBaseDir: frontend

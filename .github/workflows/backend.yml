@@ -17,8 +17,13 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACKEND }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Sonar legge la storia per attribuire i problemi al codice nuovo.
+          fetch-depth: 0
       # Il toolchain Java 25 lo scarica Gradle (foojay); serve un JDK per avviare il wrapper.
       - uses: actions/setup-java@v4
         with:
@@ -26,7 +31,10 @@ jobs:
           java-version: 25
       - uses: gradle/actions/setup-gradle@v4
       # I test che toccano il DB usano Testcontainers: Docker è già sul runner.
-      - run: ./gradlew test --no-daemon
+      - run: ./gradlew test jacocoTestReport --no-daemon
+      # Le PR da fork e di Dependabot non vedono i secret: lì l'analisi si salta.
+      - run: ./gradlew sonar --no-daemon
+        if: env.SONAR_TOKEN != ''
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

@@ -21,6 +21,7 @@ export default defineConfig(() => ({
     coverage: {
       reportsDirectory: '../../../coverage/libs/shared/util',
       provider: 'v8' as const,
+      reporter: ['lcov'],
     },
   },
 }));
