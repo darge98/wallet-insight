@@ -120,20 +120,13 @@
             <label class="block text-xs font-medium text-ink-muted" for="subscription-category">
               Categoria
             </label>
-            <select
-              id="subscription-category"
+            <app-category-picker
+              inputId="subscription-category"
+              class="mt-1.5"
+              emptyLabel="Nessuna"
               [formField]="subscriptionForm.categoryId"
-              class="field mt-1.5"
-            >
-              <option value="">Nessuna</option>
-              @for (group of categoryGroups(); track group.macro.id) {
-                <optgroup [label]="group.macro.name">
-                  @for (category of group.children; track category.id) {
-                    <option [value]="category.id">{{ category.name }}</option>
-                  }
-                </optgroup>
-              }
-            </select>
+              [categories]="categories()"
+            />
           </div>
           <div class="min-w-0">
             <label class="block text-xs font-medium text-ink-muted" for="subscription-account">

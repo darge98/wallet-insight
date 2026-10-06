@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 
 import { CategoryId, SourceCategory, SourceCategoryId } from '@wallet/shared-domain';
 import { Alert, EmptyState, Icon, Skeleton } from '@wallet/shared-ui';
+import { CategoryPicker } from '@wallet/shared-ui/category-picker';
 
 import { CategoriesFacade } from '../data-access/categories-facade';
 import { CategoryEditor } from '../ui/category-editor';
@@ -21,7 +22,7 @@ interface SourceGroup {
   selector: 'app-categories-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [CategoriesFacade],
-  imports: [Alert, CategoryEditor, EmptyState, Icon, Skeleton],
+  imports: [Alert, CategoryEditor, CategoryPicker, EmptyState, Icon, Skeleton],
   templateUrl: './categories-page.html',
   host: { class: 'block' },
 })

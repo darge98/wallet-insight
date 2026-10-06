@@ -14,7 +14,6 @@ import { Account } from '@wallet/accounts-domain';
 import {
   awaitingSettlement,
   Category,
-  categoryTree,
   COUNTER_PARTY_LABELS,
   editOf,
   FinanceRecord,
@@ -25,16 +24,11 @@ import {
   recordTitle,
 } from '@wallet/shared-domain';
 import { Badge, DayLabelPipe, Icon, MoneyPipe } from '@wallet/shared-ui';
+import { CategoryPicker } from '@wallet/shared-ui/category-picker';
 
 interface DetailRow {
   readonly label: string;
   readonly value: string;
-}
-
-/** Le categorie di un gruppo, per un `<optgroup>`. */
-interface CategoryGroup {
-  readonly label: string;
-  readonly categories: readonly Category[];
 }
 
 /**
@@ -54,7 +48,7 @@ interface CategoryGroup {
 @Component({
   selector: 'app-record-detail-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Icon, MoneyPipe, DayLabelPipe, FormField, FormRoot, RouterLink],
+  imports: [Badge, CategoryPicker, Icon, MoneyPipe, DayLabelPipe, FormField, FormRoot, RouterLink],
   host: { class: 'contents' },
   templateUrl: './record-detail-panel.html',
 })
@@ -90,8 +84,6 @@ export class RecordDetailPanel {
 
   /** Finché non si tocca niente non c'è niente da salvare: il bottone lo dice. */
   protected readonly dirty = computed(() => this.editForm().dirty());
-
-  protected readonly noCategory = NO_CATEGORY;
 
   /**
    * Un movimento che la banca deve ancora confermare non si corregge, e i campi
@@ -139,13 +131,6 @@ export class RecordDetailPanel {
    * una scelta — l'API non sa togliere una categoria, sa solo spostarla.
    */
   protected readonly withoutCategory = computed(() => this.record()?.categoryId === null);
-
-  /** Le sottocategorie sotto la loro macro: un movimento non sta in una macro. */
-  protected readonly categoryGroups = computed<readonly CategoryGroup[]>(() =>
-    categoryTree(this.categories())
-      .filter((branch) => branch.children.length > 0)
-      .map((branch) => ({ label: branch.macro.name, categories: branch.children })),
-  );
 
   protected readonly amountTone = computed(() => {
     switch (this.record()?.type) {

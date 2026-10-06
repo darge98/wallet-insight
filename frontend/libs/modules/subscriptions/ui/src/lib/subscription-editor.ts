@@ -11,15 +11,9 @@ import {
 import { FormField, FormRoot, form, schema, validate } from '@angular/forms/signals';
 
 import { Account } from '@wallet/accounts-domain';
-import {
-  asAccountId,
-  asCategoryId,
-  Category,
-  categoryTree,
-  IsoDate,
-  money,
-} from '@wallet/shared-domain';
+import { asAccountId, asCategoryId, Category, IsoDate, money } from '@wallet/shared-domain';
 import { amountInput, Icon, parseAmount } from '@wallet/shared-ui';
+import { CategoryPicker } from '@wallet/shared-ui/category-picker';
 import {
   Cadence,
   CADENCE_UNITS,
@@ -136,7 +130,7 @@ function frequencyOf(cadence: Cadence): Frequency {
 @Component({
   selector: 'app-subscription-editor',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormField, FormRoot, Icon],
+  imports: [CategoryPicker, FormField, FormRoot, Icon],
   host: { class: 'contents' },
   templateUrl: './subscription-editor.html',
 })
@@ -204,11 +198,6 @@ export class SubscriptionEditor {
     const subscription = this.subscription();
     return subscription ? `Modifica «${subscription.name}»` : 'Nuovo abbonamento';
   });
-
-  /** Le macro come gruppi, le sottocategorie come scelte: i movimenti stanno lì. */
-  protected readonly categoryGroups = computed(() =>
-    categoryTree(this.categories()).filter((branch) => branch.children.length > 0),
-  );
 
   protected readonly isCustom = computed(() => this.model().frequency === 'custom');
 
