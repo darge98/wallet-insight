@@ -4,6 +4,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 	jacoco
 	id("org.sonarqube") version "7.5.0.8588"
+	id("org.owasp.dependencycheck") version "13.0.0"
 }
 
 group = "it.walletinsight"
@@ -21,6 +22,9 @@ repositories {
 }
 
 extra["springModulithVersion"] = "2.1.1"
+// Spring Boot 4.1.1 porta Tomcat 11.0.24, con CVE alte (dependencyCheckAnalyze):
+// si toglie quando un Boot più nuovo porta una versione corretta.
+extra["tomcat.version"] = "11.0.26"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -64,6 +68,22 @@ tasks.withType<Test> {
 jacoco {
 	// Java 25 lo legge solo da JaCoCo 0.8.14 in su.
 	toolVersion = "0.8.15"
+}
+
+// `./gradlew dependencyCheckAnalyze`: le librerie confrontate con le vulnerabilità
+// note (NVD). Fallisce da «alta» in su; senza chiave NVD il download non finisce.
+dependencyCheck {
+	failBuildOnCVSS = 7.0f
+	nvd {
+		apiKey = providers.environmentVariable("NVD_API_KEY")
+	}
+	analyzers {
+		// Chiede credenziali proprie; il resto del backend è solo Java.
+		ossIndex { enabled = false }
+		nodeAudit { enabled = false }
+		nodePackage { enabled = false }
+		retirejs { enabled = false }
+	}
 }
 
 tasks.jacocoTestReport {
