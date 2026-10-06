@@ -22,6 +22,9 @@ repositories {
 }
 
 extra["springModulithVersion"] = "2.1.1"
+// Spring Boot 4.1.1 porta Tomcat 11.0.24, con CVE alte (dependencyCheckAnalyze):
+// si toglie quando un Boot più nuovo porta una versione corretta.
+extra["tomcat.version"] = "11.0.26"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
