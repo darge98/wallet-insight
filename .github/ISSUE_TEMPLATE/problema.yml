@@ -1,0 +1,62 @@
+name: Segnala un problema
+description: Qualcosa non funziona come dovrebbe.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Grazie della segnalazione. Se riguarda la sicurezza, non usare questo modulo:
+        segui la [politica di sicurezza](https://github.com/darge98/wallet-insight/blob/main/SECURITY.md).
+
+        Non incollare dati finanziari reali o token: se servono esempi, usa valori inventati.
+  - type: textarea
+    id: cosa
+    attributes:
+      label: Cosa succede
+      description: Descrivi il problema in poche righe.
+    validations:
+      required: true
+  - type: textarea
+    id: passi
+    attributes:
+      label: Come riprodurlo
+      description: I passi, dalla schermata di partenza.
+      placeholder: |
+        1. Apri Movimenti
+        2. Filtra per il conto "Carta di credito"
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: atteso
+    attributes:
+      label: Cosa ti aspettavi
+    validations:
+      required: true
+  - type: dropdown
+    id: parte
+    attributes:
+      label: Parte coinvolta
+      options:
+        - Panoramica
+        - Movimenti
+        - Budget
+        - Abbonamenti
+        - Categorie
+        - Import dalle sorgenti
+        - Installazione e Docker
+        - Altro
+    validations:
+      required: true
+  - type: input
+    id: versione
+    attributes:
+      label: Versione
+      description: Il commit di `main` che stai usando (`git rev-parse --short HEAD`).
+      placeholder: 6b817c3
+  - type: textarea
+    id: log
+    attributes:
+      label: Log ed errori
+      description: Errori della console del browser o del backend (`docker compose logs backend`).
+      render: text

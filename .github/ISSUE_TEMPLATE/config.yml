@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Segnala una vulnerabilità
+    url: https://github.com/darge98/wallet-insight/security/advisories/new
+    about: Le vulnerabilità si segnalano in privato, non con una issue pubblica.
