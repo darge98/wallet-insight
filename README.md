@@ -1,22 +1,29 @@
-<img src="site/assets/favicon.svg" width="56" height="56" alt="" />
+<div align="center">
+
+<img src="site/assets/favicon.svg" width="72" height="72" alt="" />
 
 # Wallet Insights
 
-[![Frontend](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml)
-[![Backend](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml)
-[![Licenza MIT](https://img.shields.io/badge/licenza-MIT-22634c)](LICENSE)
+Le tue finanze, sul tuo server.
+
+[![Frontend](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml) [![Backend](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml) [![Licenza MIT](https://img.shields.io/badge/licenza-MIT-22634c)](LICENSE) [![Sito](https://img.shields.io/badge/sito-darge98.github.io%2Fwallet--insight-22634c)](https://darge98.github.io/wallet-insight/)
+
+</div>
 
 Personal finance tracker self-hosted, pensato per **una persona sola**. Importa conti e
 movimenti da [BudgetBakers Wallet](https://budgetbakers.com) e li riorganizza: categorie
 proprie, budget mensili, abbonamenti e analisi di periodo, calcolate dal database. Gira
 sul tuo hardware: i dati restano nel tuo PostgreSQL.
 
-**Sito:** <https://darge98.github.io/wallet-insight/>
+Funzioni, sorgenti e installazione in breve sulla landing:
+**[darge98.github.io/wallet-insight](https://darge98.github.io/wallet-insight/)**.
 
-<picture>
-  <source srcset="site/assets/panoramica-dark.webp" media="(prefers-color-scheme: dark)" />
-  <img src="site/assets/panoramica-light.webp" alt="La panoramica di Wallet Insights: saldo, entrate, uscite e margine del periodo, la curva delle spese e la ripartizione per categoria." />
-</picture>
+<a href="https://darge98.github.io/wallet-insight/">
+  <picture>
+    <source srcset="site/assets/panoramica-dark.webp" media="(prefers-color-scheme: dark)" />
+    <img src="site/assets/panoramica-light.webp" alt="La panoramica di Wallet Insights: saldo, entrate, uscite e margine del periodo, la curva delle spese e la ripartizione per categoria." />
+  </picture>
+</a>
 
 <sub>Gli screenshot mostrano dati fittizi.</sub>
 
@@ -97,7 +104,7 @@ Cambiare `ENCRYPTION_KEY` rende illeggibili i token già salvati.
 | ------------------------------ | -------------------------------------------------------------------------------- |
 | [`frontend/`](frontend)        | Angular 22 + Nx: zoneless, signal, ports & adapters                              |
 | [`backend/`](backend)          | Spring Boot 4 + Spring Modulith, Spring Data JDBC, Flyway, PostgreSQL 17, Java 25 |
-| [`site/`](site)                | La landing pubblicata su GitHub Pages: HTML e CSS statici, senza build           |
+| [`site/`](site)                | La [landing](https://darge98.github.io/wallet-insight/) su GitHub Pages: HTML e CSS statici, senza build |
 | [`compose.yaml`](compose.yaml) | Lo stack completo: PostgreSQL, backend e frontend servito da nginx               |
 
 I due progetti sono indipendenti e si buildano ognuno dalla propria cartella:
