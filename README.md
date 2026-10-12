@@ -1,11 +1,17 @@
-<img src="site/assets/favicon.svg" width="56" height="56" alt="" />
+<div align="center">
+
+<img src="site/assets/favicon.svg" width="72" height="72" alt="" />
 
 # Wallet Insights
+
+Le tue finanze, sul tuo server.
 
 [![Frontend](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml)
 [![Backend](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml)
 [![Licenza MIT](https://img.shields.io/badge/licenza-MIT-22634c)](LICENSE)
 [![Sito](https://img.shields.io/badge/sito-darge98.github.io%2Fwallet--insight-22634c)](https://darge98.github.io/wallet-insight/)
+
+</div>
 
 Personal finance tracker self-hosted, pensato per **una persona sola**. Importa conti e
 movimenti da [BudgetBakers Wallet](https://budgetbakers.com) e li riorganizza: categorie
