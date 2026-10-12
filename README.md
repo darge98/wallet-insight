@@ -6,10 +6,7 @@
 
 Le tue finanze, sul tuo server.
 
-[![Frontend](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml)
-[![Backend](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml)
-[![Licenza MIT](https://img.shields.io/badge/licenza-MIT-22634c)](LICENSE)
-[![Sito](https://img.shields.io/badge/sito-darge98.github.io%2Fwallet--insight-22634c)](https://darge98.github.io/wallet-insight/)
+[![Frontend](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml) [![Backend](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/backend.yml) [![Licenza MIT](https://img.shields.io/badge/licenza-MIT-22634c)](LICENSE) [![Sito](https://img.shields.io/badge/sito-darge98.github.io%2Fwallet--insight-22634c)](https://darge98.github.io/wallet-insight/)
 
 </div>
 
