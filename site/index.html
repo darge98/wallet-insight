@@ -74,16 +74,18 @@
             </div>
           </div>
           <figure class="shot shot--hero reveal">
-            <picture>
-              <source srcset="assets/panoramica-dark.webp" media="(prefers-color-scheme: dark)" />
-              <img
-                src="assets/panoramica-light.webp"
-                width="1920"
-                height="1200"
-                fetchpriority="high"
-                alt="La panoramica di Wallet Insights: saldo complessivo, entrate, uscite e margine degli ultimi 30 giorni, con la curva delle spese e la ripartizione per categoria."
-              />
-            </picture>
+            <button class="shot__open" type="button" aria-label="Ingrandisci lo screenshot della panoramica">
+              <picture>
+                <source srcset="assets/panoramica-dark.webp" media="(prefers-color-scheme: dark)" />
+                <img
+                  src="assets/panoramica-light.webp"
+                  width="1920"
+                  height="1200"
+                  fetchpriority="high"
+                  alt="La panoramica di Wallet Insights: saldo complessivo, entrate, uscite e margine degli ultimi 30 giorni, con la curva delle spese e la ripartizione per categoria."
+                />
+              </picture>
+            </button>
           </figure>
         </div>
       </section>
@@ -127,16 +129,18 @@
                 <p>Filtri per periodo, conti e categorie, con i totali dell'intero filtro. Correggi descrizione, controparte e categoria.</p>
               </div>
               <figure class="shot">
-                <picture>
-              <source srcset="assets/movimenti-dark.webp" media="(prefers-color-scheme: dark)" />
-              <img
-                src="assets/movimenti-light.webp"
-                width="1920"
-                height="1200"
-                loading="lazy"
-                alt="L'elenco dei movimenti del mese raggruppati per giorno, con i totali e le uscite per categoria."
-              />
-            </picture>
+                <button class="shot__open" type="button" aria-label="Ingrandisci lo screenshot dei movimenti">
+                  <picture>
+                <source srcset="assets/movimenti-dark.webp" media="(prefers-color-scheme: dark)" />
+                <img
+                  src="assets/movimenti-light.webp"
+                  width="1920"
+                  height="1200"
+                  loading="lazy"
+                  alt="L'elenco dei movimenti del mese raggruppati per giorno, con i totali e le uscite per categoria."
+                />
+              </picture>
+                </button>
               </figure>
             </article>
 
@@ -160,16 +164,18 @@
 
             <article class="tile tile--image tile--tall reveal">
               <figure class="shot">
-                <picture>
-              <source srcset="assets/budget-dark.webp" media="(prefers-color-scheme: dark)" />
-              <img
-                src="assets/budget-light.webp"
-                width="1920"
-                height="1200"
-                loading="lazy"
-                alt="I budget del mese con lo speso e il residuo di ogni gruppo di categorie."
-              />
-            </picture>
+                <button class="shot__open" type="button" aria-label="Ingrandisci lo screenshot dei budget">
+                  <picture>
+                <source srcset="assets/budget-dark.webp" media="(prefers-color-scheme: dark)" />
+                <img
+                  src="assets/budget-light.webp"
+                  width="1920"
+                  height="1200"
+                  loading="lazy"
+                  alt="I budget del mese con lo speso e il residuo di ogni gruppo di categorie."
+                />
+              </picture>
+                </button>
               </figure>
               <div class="tile__text">
                 <h3>Budget</h3>
@@ -276,10 +282,20 @@ docker compose up -d --build</code></pre>
               <summary>Con cosa è fatto?<i class="ph ph-plus" aria-hidden="true"></i></summary>
               <p>Angular 22 per l'interfaccia, Spring Boot 4 su Java 25 per il backend, PostgreSQL 17 per i dati. Tutto in container.</p>
             </details>
+            <div class="faq__end" aria-hidden="true"></div>
           </div>
         </div>
       </section>
     </main>
+
+    <!-- Lo screenshot ingrandito: main.js lo apre partendo dalla miniatura (FLIP). -->
+    <dialog class="viewer" aria-label="Screenshot ingrandito">
+      <img class="viewer__img" alt="" />
+      <button class="viewer__close btn btn--ghost btn--sm" type="button">
+        <i class="ph ph-x" aria-hidden="true"></i>
+        Chiudi
+      </button>
+    </dialog>
 
     <footer class="footer">
       <div class="wrap footer__inner">

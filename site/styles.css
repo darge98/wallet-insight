@@ -842,8 +842,13 @@ code {
   gap: 40px;
 }
 
-.faq__list details {
-  border-bottom: 1px solid var(--border);
+.faq__list details,
+.faq__end {
+  border-top: 1px solid var(--border);
+}
+
+.faq__list details:first-child {
+  border-top: 0;
 }
 
 .faq__list summary {
@@ -882,6 +887,88 @@ code {
   .faq__grid {
     grid-template-columns: 4fr 7fr;
     gap: 80px;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Screenshot ingrandito                                                      */
+/* -------------------------------------------------------------------------- */
+
+.shot__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.shot__open:focus-visible {
+  outline-offset: -4px;
+}
+
+.viewer {
+  /* Riempie la finestra: è il riquadro in cui si misura la posizione finale. */
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 72px 16px 24px;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.viewer[open] {
+  display: grid;
+  place-items: center;
+}
+
+.viewer::backdrop {
+  background: rgb(10 16 14 / 72%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .viewer::backdrop {
+    background: rgb(10 16 14 / 94%);
+    backdrop-filter: none;
+  }
+}
+
+.viewer__img {
+  max-width: min(1600px, 100%);
+  /* Esplicita e non in percentuale: la riga della griglia non ha un'altezza definita. */
+  max-height: calc(100dvh - 96px);
+  width: auto;
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: 0 40px 80px -30px rgb(0 0 0 / 55%);
+  /* La FLIP scala dall'angolo in alto a sinistra, quello che misura. */
+  transform-origin: 0 0;
+  cursor: zoom-out;
+}
+
+.viewer__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--bg);
+}
+
+html:has(.viewer[open]) {
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .viewer {
+    padding: 80px 48px 48px;
+  }
+
+  .viewer__img {
+    max-height: calc(100dvh - 128px);
   }
 }
 
