@@ -112,6 +112,8 @@ wallet-insight/
 Chi vuole metterci le mani trova i dettagli per lo sviluppo nei README di
 [`frontend/`](frontend/README.md) e [`backend/`](backend/README.md).
 
-## Licenza
+## Comunità e licenza
 
+Chi partecipa al progetto, con issue, pull request o commenti, si impegna a rispettare
+il [codice di comportamento](CODE_OF_CONDUCT.md). Il codice è distribuito con licenza
 [MIT](LICENSE).

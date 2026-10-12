@@ -1,0 +1,22 @@
+name: Proponi una funzione
+description: Un'idea per migliorare Wallet Insights.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: bisogno
+    attributes:
+      label: Di cosa hai bisogno
+      description: Il problema che vuoi risolvere, prima della soluzione.
+      placeholder: Ogni mese devo controllare a mano quali abbonamenti sono aumentati di prezzo...
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Come lo immagini
+      description: Come potrebbe funzionare, anche a grandi linee.
+  - type: textarea
+    id: alternative
+    attributes:
+      label: Come fai oggi
+      description: Le alternative o gli aggiramenti che usi adesso, se ce ne sono.
