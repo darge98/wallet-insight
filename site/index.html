@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wallet Insights</title>
+    <meta
+      name="description"
+      content="Personal finance tracker self-hosted, pensato per una persona sola. Importa i tuoi conti e li riorganizza in categorie, budget e abbonamenti, sul tuo hardware."
+    />
+    <meta name="theme-color" content="#22634c" />
+    <meta property="og:title" content="Wallet Insights" />
+    <meta
+      property="og:description"
+      content="Le tue finanze, sul tuo server. Personal finance tracker self-hosted per una persona sola."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="assets/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <!-- Il font principale si precarica: è quello del titolo, il candidato LCP. -->
+    <link rel="preload" href="fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Subito, prima del primo disegno: nasconde gli elementi che entreranno in vista. -->
+    <script>document.documentElement.classList.add('js');</script>
+    <!-- Phosphor in versione web font: le icone senza un passo di build. -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
+    <script src="main.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#contenuto">Vai al contenuto</a>
+
+    <header class="nav">
+      <div class="wrap nav__inner">
+        <a class="brand" href="#top" aria-label="Wallet Insights, torna all'inizio">
+          <img class="brand__mark" src="assets/favicon.svg" width="30" height="30" alt="" />
+          Wallet Insights
+        </a>
+        <nav aria-label="Sezioni">
+          <ul class="nav__links">
+            <li><a href="#funzioni">Funzioni</a></li>
+            <li><a href="#sorgenti">Sorgenti</a></li>
+            <li><a href="#installa">Installazione</a></li>
+            <li><a href="#domande">Domande</a></li>
+          </ul>
+        </nav>
+        <a class="btn btn--ghost btn--sm" href="https://github.com/darge98/wallet-insight">
+          <i class="ph ph-github-logo" aria-hidden="true"></i>
+          GitHub
+        </a>
+      </div>
+    </header>
+
+    <main id="contenuto">
+      <!-- Hero -->
+      <section class="hero" id="top">
+        <div class="wrap hero__grid">
+          <div class="hero__copy">
+            <p class="eyebrow reveal">Self-hosted, per una persona</p>
+            <h1 class="reveal">Le tue finanze, sul&nbsp;tuo&nbsp;server.</h1>
+            <p class="lead reveal">
+              Importa conti e movimenti e li riorganizza in categorie, budget e abbonamenti.
+              Gira sul tuo hardware, senza account di nessuno.
+            </p>
+            <div class="hero__ctas reveal">
+              <a class="btn btn--primary" href="#installa">
+                Installa
+                <i class="ph ph-arrow-down" aria-hidden="true"></i>
+              </a>
+              <a class="btn btn--ghost" href="https://github.com/darge98/wallet-insight">
+                <i class="ph ph-github-logo" aria-hidden="true"></i>
+                GitHub
+              </a>
+            </div>
+          </div>
+          <figure class="shot shot--hero reveal">
+            <picture>
+              <source srcset="assets/panoramica-dark.webp" media="(prefers-color-scheme: dark)" />
+              <img
+                src="assets/panoramica-light.webp"
+                width="1920"
+                height="1200"
+                fetchpriority="high"
+                alt="La panoramica di Wallet Insights: saldo complessivo, entrate, uscite e margine degli ultimi 30 giorni, con la curva delle spese e la ripartizione per categoria."
+              />
+            </picture>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Perché self-hosted -->
+      <section class="principles" aria-labelledby="principles-title">
+        <div class="wrap principles__grid">
+          <h2 id="principles-title" class="principles__title reveal">
+            I movimenti del tuo conto dicono dove vivi, cosa compri e chi frequenti.
+            Restano a&nbsp;casa&nbsp;tua.
+          </h2>
+          <dl class="principles__list">
+            <div class="reveal">
+              <dt><i class="ph ph-database" aria-hidden="true"></i>Il tuo PostgreSQL</dt>
+              <dd>Ogni dato sta nel database che avvii tu. Lo copi, lo interroghi, lo cancelli.</dd>
+            </div>
+            <div class="reveal">
+              <dt><i class="ph ph-lock-key" aria-hidden="true"></i>Credenziali cifrate</dt>
+              <dd>I token delle sorgenti sono cifrati con AES-256, con una chiave che generi tu.</dd>
+            </div>
+            <div class="reveal">
+              <dt><i class="ph ph-user" aria-hidden="true"></i>Un profilo, il tuo</dt>
+              <dd>Niente iscrizioni, niente team, niente piani. Un'istanza per una persona.</dd>
+            </div>
+            <div class="reveal">
+              <dt><i class="ph ph-calculator" aria-hidden="true"></i>Conti al centesimo</dt>
+              <dd>Importi interi in centesimi e totali calcolati dal database, mai arrotondati dal browser.</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Funzioni -->
+      <section class="features" id="funzioni" aria-labelledby="features-title">
+        <div class="wrap">
+          <h2 id="features-title" class="section-title reveal">Quello che ti serve, niente di più.</h2>
+          <div class="bento">
+            <article class="tile tile--wide tile--image reveal">
+              <div class="tile__text">
+                <h3>Movimenti</h3>
+                <p>Filtri per periodo, conti e categorie, con i totali dell'intero filtro. Correggi descrizione, controparte e categoria.</p>
+              </div>
+              <figure class="shot">
+                <picture>
+              <source srcset="assets/movimenti-dark.webp" media="(prefers-color-scheme: dark)" />
+              <img
+                src="assets/movimenti-light.webp"
+                width="1920"
+                height="1200"
+                loading="lazy"
+                alt="L'elenco dei movimenti del mese raggruppati per giorno, con i totali e le uscite per categoria."
+              />
+            </picture>
+              </figure>
+            </article>
+
+            <article class="tile tile--accent reveal">
+              <i class="ph ph-chart-pie-slice tile__icon" aria-hidden="true"></i>
+              <h3>Analisi di periodo</h3>
+              <p>Dove finiscono i soldi, per categoria e controparte, confrontato col periodo precedente.</p>
+            </article>
+
+            <article class="tile tile--soft reveal">
+              <i class="ph ph-calendar-check tile__icon" aria-hidden="true"></i>
+              <h3>Abbonamenti</h3>
+              <p>Gli addebiti ricorrenti in elenco o in calendario, col costo mensile e annuo.</p>
+            </article>
+
+            <article class="tile tile--pattern reveal">
+              <i class="ph ph-tree-structure tile__icon" aria-hidden="true"></i>
+              <h3>Categorie tue</h3>
+              <p>Un albero a due livelli deciso da te. Riagganci una categoria e i movimenti la seguono.</p>
+            </article>
+
+            <article class="tile tile--image tile--tall reveal">
+              <figure class="shot">
+                <picture>
+              <source srcset="assets/budget-dark.webp" media="(prefers-color-scheme: dark)" />
+              <img
+                src="assets/budget-light.webp"
+                width="1920"
+                height="1200"
+                loading="lazy"
+                alt="I budget del mese con lo speso e il residuo di ogni gruppo di categorie."
+              />
+            </picture>
+              </figure>
+              <div class="tile__text">
+                <h3>Budget</h3>
+                <p>Limiti mensili su gruppi di categorie, con sotto-budget, speso e residuo.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sorgenti -->
+      <section class="sources" id="sorgenti" aria-labelledby="sources-title">
+        <div class="wrap">
+          <p class="eyebrow reveal">Sorgenti dei dati</p>
+          <h2 id="sources-title" class="section-title reveal">Dai tuoi conti, ogni giorno.</h2>
+          <p class="section-lead reveal">
+            L'import è incrementale: gira a ogni avvio e una volta al giorno, e scarica solo
+            quello che manca.
+          </p>
+          <ol class="sources__flow">
+            <li class="source reveal">
+              <div class="source__head">
+                <i class="ph ph-wallet" aria-hidden="true"></i>
+                <h3>BudgetBakers Wallet</h3>
+                <span class="status status--live">Disponibile</span>
+              </div>
+              <p>
+                Colleghi il token personale generato dall'app web di Wallet: arrivano conti,
+                movimenti e categorie che hai già.
+              </p>
+            </li>
+            <li class="source__arrow" aria-hidden="true"><i class="ph ph-arrow-right"></i></li>
+            <li class="source reveal">
+              <div class="source__head">
+                <i class="ph ph-bank" aria-hidden="true"></i>
+                <h3>Conti bancari via PSD2</h3>
+                <span class="status">In sviluppo</span>
+              </div>
+              <p>
+                Collegamento diretto alla banca tramite Enable Banking, in modalità ristretta:
+                gratuita e limitata ai tuoi conti, che è esattamente il caso d'uso.
+              </p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Installazione -->
+      <section class="install" id="installa" aria-labelledby="install-title">
+        <div class="wrap install__inner">
+          <h2 id="install-title" class="section-title reveal">Tre comandi, poi apri il browser.</h2>
+          <p class="section-lead reveal">Serve Docker. Lo stack avvia PostgreSQL, il backend e l'app.</p>
+
+          <div class="code reveal">
+            <div class="code__bar">
+              <span>Terminale</span>
+              <button class="copy" type="button" data-copy="install-cmd" aria-live="polite">
+                <i class="ph ph-copy" aria-hidden="true"></i>
+                <span class="copy__label">Copia</span>
+              </button>
+            </div>
+            <pre id="install-cmd"><code><span class="c"># 1. Il codice e il file di configurazione</span>
+git clone https://github.com/darge98/wallet-insight.git
+cd wallet-insight &amp;&amp; cp .env.example .env
+
+<span class="c"># 2. La chiave che cifra i token: incollala in ENCRYPTION_KEY dentro .env</span>
+openssl rand -base64 32
+
+<span class="c"># 3. Avvio</span>
+docker compose up -d --build</code></pre>
+          </div>
+
+          <div class="install__notes">
+            <p class="reveal">
+              <i class="ph ph-browser" aria-hidden="true"></i>
+              <span>L'app risponde su <code>localhost:8081</code>. Al primo accesso crei il profilo e colleghi la sorgente.</span>
+            </p>
+            <p class="reveal">
+              <i class="ph ph-key" aria-hidden="true"></i>
+              <span>Conserva la chiave: se cambia, i token già salvati diventano illeggibili e vanno ricollegati.</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Domande -->
+      <section class="faq" id="domande" aria-labelledby="faq-title">
+        <div class="wrap faq__grid">
+          <h2 id="faq-title" class="section-title reveal">Domande frequenti</h2>
+          <div class="faq__list">
+            <details class="reveal">
+              <summary>Quanto costa?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+              <p>Niente. Il codice è su GitHub con licenza MIT e lo installi dove vuoi. L'unico costo è la macchina su cui gira, anche un mini PC o un NAS.</p>
+            </details>
+            <details class="reveal">
+              <summary>Quali banche sono supportate?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+              <p>Oggi tutte quelle che hai già collegato a BudgetBakers Wallet. Con PSD2 la copertura dipenderà dalle banche raggiungibili tramite Enable Banking.</p>
+            </details>
+            <details class="reveal">
+              <summary>Posso usarlo in più persone?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+              <p>No, di proposito. Ogni istanza ha un solo profilo. Per una seconda persona si avvia una seconda istanza, con la propria chiave.</p>
+            </details>
+            <details class="reveal">
+              <summary>Con cosa è fatto?<i class="ph ph-plus" aria-hidden="true"></i></summary>
+              <p>Angular 22 per l'interfaccia, Spring Boot 4 su Java 25 per il backend, PostgreSQL 17 per i dati. Tutto in container.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer__inner">
+        <a class="brand" href="#top">
+          <img class="brand__mark" src="assets/favicon.svg" width="30" height="30" alt="" />
+          Wallet Insights
+        </a>
+        <p>Personal finance tracker self-hosted. Licenza MIT.</p>
+        <a class="footer__link" href="https://github.com/darge98/wallet-insight">
+          <i class="ph ph-github-logo" aria-hidden="true"></i>
+          darge98/wallet-insight
+        </a>
+      </div>
+    </footer>
+  </body>
+</html>
