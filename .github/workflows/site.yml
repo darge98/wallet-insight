@@ -1,0 +1,36 @@
+name: Sito
+
+# Pubblica la landing di site/ su GitHub Pages. È HTML statico: niente build,
+# la cartella è già il sito. Richiede Pages configurato con sorgente
+# "GitHub Actions" (Settings > Pages).
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', '.github/workflows/site.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Una pubblicazione alla volta; quella in corso si completa invece di lasciare
+# il sito a metà.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
