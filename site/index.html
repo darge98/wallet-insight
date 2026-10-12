@@ -15,7 +15,9 @@
       content="Le tue finanze, sul tuo server. Personal finance tracker self-hosted per una persona sola."
     />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="assets/favicon.ico" />
+    <link rel="icon" href="assets/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
     <!-- Il font principale si precarica: è quello del titolo, il candidato LCP. -->
     <link rel="preload" href="fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="styles.css" />
@@ -31,7 +33,7 @@
     <header class="nav">
       <div class="wrap nav__inner">
         <a class="brand" href="#top" aria-label="Wallet Insights, torna all'inizio">
-          <span class="brand__mark" aria-hidden="true">W</span>
+          <img class="brand__mark" src="assets/favicon.svg" width="30" height="30" alt="" />
           Wallet Insights
         </a>
         <nav aria-label="Sezioni">
@@ -282,7 +284,7 @@ docker compose up -d --build</code></pre>
     <footer class="footer">
       <div class="wrap footer__inner">
         <a class="brand" href="#top">
-          <span class="brand__mark" aria-hidden="true">W</span>
+          <img class="brand__mark" src="assets/favicon.svg" width="30" height="30" alt="" />
           Wallet Insights
         </a>
         <p>Personal finance tracker self-hosted. Licenza MIT.</p>

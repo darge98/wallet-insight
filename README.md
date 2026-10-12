@@ -1,3 +1,5 @@
+<img src="site/assets/favicon.svg" width="56" height="56" alt="" />
+
 # Wallet Insights
 
 [![Frontend](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml/badge.svg)](https://github.com/darge98/wallet-insight/actions/workflows/frontend.yml)

@@ -332,15 +332,8 @@ code {
 }
 
 .brand__mark {
-  display: grid;
-  place-items: center;
   width: 30px;
   height: 30px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: var(--accent-contrast);
-  font-size: 0.95rem;
-  font-weight: 700;
 }
 
 .nav__links {
